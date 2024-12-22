@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace EntityLayer.Dtos.RequestDtos.ProductRequestDtos;
 
-public record UpdateProductRequestDto(int Id, long BarcodeNo, short CategoryNo, int ShortCode, string Name, decimal Price, int Stock, decimal Weight, DateTime Expiration, DateTime Production, DateTime Created) : IRequestDto
+public record UpdateProductRequestDto(int Id, long BarcodeNo, int CategoryId, int ShortCode, string Name, decimal Price, int Stock, decimal? Weight, DateTime? Expiration, DateTime? Production, DateTime Created) : IRequestDto
 {
     public static Product ConvertToEntity(UpdateProductRequestDto updateProductRequestDto)
     {
@@ -16,7 +16,7 @@ public record UpdateProductRequestDto(int Id, long BarcodeNo, short CategoryNo, 
         {
             Id = updateProductRequestDto.Id,
             BarcodeNo = updateProductRequestDto.BarcodeNo,
-            CategoryNo = updateProductRequestDto.CategoryNo,
+            CategoryId = updateProductRequestDto.CategoryId,
             ShortCode = updateProductRequestDto.ShortCode,
             Name = updateProductRequestDto.Name,
             Price = updateProductRequestDto.Price,

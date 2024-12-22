@@ -8,14 +8,14 @@ using System.Threading.Tasks;
 
 namespace EntityLayer.Dtos.RequestDtos.ProductRequestDtos;
 
-public record CreateProductRequestDto(long BarcodeNo, short CategoryNo, int ShortCode, string Name, decimal Price, int Stock, decimal Weight, DateTime Expiration, DateTime Production) : IRequestDto
+public record CreateProductRequestDto(long BarcodeNo, int CategoryId, int ShortCode, string Name, decimal Price, int Stock, decimal? Weight, DateTime? Expiration, DateTime? Production) : IRequestDto
 {
     public static Product ConvertToEntity(CreateProductRequestDto createProductRequestDto)
     {
         return new Product
         {
             BarcodeNo = createProductRequestDto.BarcodeNo,
-            CategoryNo = createProductRequestDto.CategoryNo,
+            CategoryId = createProductRequestDto.CategoryId,
             ShortCode = createProductRequestDto.ShortCode,
             Name = createProductRequestDto.Name,
             Price = createProductRequestDto.Price,

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace EntityLayer.Dtos.RequestDtos.StoreRequestDtos;
 
-public record CreateStoreRequestDto(int StoreNo, string Name, string Address, int PhoneNumber, DateTime Created)
+public record CreateStoreRequestDto(int StoreNo, string Name, string Address, int PhoneNumber)
 {
     public static Store ConvertToEntity(CreateStoreRequestDto createStoreRequestDto)
     {
@@ -17,7 +17,7 @@ public record CreateStoreRequestDto(int StoreNo, string Name, string Address, in
             Name = createStoreRequestDto.Name,
             Address = createStoreRequestDto.Address,
             PhoneNumber = createStoreRequestDto.PhoneNumber,
-            Created = createStoreRequestDto.Created
+            Created = DateTime.Now,
         };
     }
 }

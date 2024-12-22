@@ -9,7 +9,7 @@ namespace EntityLayer.Entities;
 
 public class User : EntityBase<int>
 {
-    public int StoreNo { get; set; }
+    public int StoreId { get; set; }
     public Store Store { get; set; } = null!;
     public string Name { get; set; } = null!;
     public string Surname { get; set; } = null!;

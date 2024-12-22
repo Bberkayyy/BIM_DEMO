@@ -7,13 +7,12 @@ using System.Threading.Tasks;
 
 namespace EntityLayer.Dtos.ResponseDtos.ProductResponseDtos;
 
-public record ResultProductResponseDto(int Id, long BarcodeNo, short CategoryNo, int ShortCode, string Name, decimal Price, int Stock, decimal? Weight, DateTime Expiration, DateTime Production, DateTime Created, DateTime? Updated, DateTime? Deleted, Category? Category)
+public record ResultProductResponseDto(int Id, long BarcodeNo, int ShortCode, string Name, decimal Price, int Stock, decimal? Weight, DateTime? Expiration, DateTime? Production, DateTime Created, DateTime? Updated, DateTime? Deleted, Category Category)
 {
     public static ResultProductResponseDto ConvertToResponse(Product entity)
     {
         return new ResultProductResponseDto(Id: entity.Id,
                                             BarcodeNo: entity.BarcodeNo,
-                                            CategoryNo: entity.CategoryNo,
                                             ShortCode: entity.ShortCode,
                                             Name: entity.Name,
                                             Price: entity.Price,

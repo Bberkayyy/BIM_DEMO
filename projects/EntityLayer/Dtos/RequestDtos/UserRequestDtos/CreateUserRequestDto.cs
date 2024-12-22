@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 
 namespace EntityLayer.Dtos.RequestDtos.UserRequestDtos;
 
-public record CreateUserRequestDto(int StoreNo, string Name, string Surname, int UserCode, int Password)
+public record CreateUserRequestDto(int StoreId, string Name, string Surname, int UserCode, int Password)
 {
     public static User ConvertToEntity(CreateUserRequestDto createUserRequestDto)
     {
         return new User()
         {
-            StoreNo = createUserRequestDto.StoreNo,
+            StoreId = createUserRequestDto.StoreId,
             Name = createUserRequestDto.Name,
             Surname = createUserRequestDto.Surname,
             UserCode = createUserRequestDto.UserCode,
