@@ -51,7 +51,13 @@ public class CategoryRules : ICategoryRules
     {
         Category? category = _categoryRepository.GetByFilter(x => x.CategoryNo == categoryNo);
         if (category != null && category.Id != id)
-            throw new BusinessException($"Category no is already exists! ({categoryNo}). Enter a different category no.");
+        {
+            if (category.CategoryNo == categoryNo)
+                throw new BusinessException($"Category no is already exists! ({categoryNo}). Enter a different category no.");
+            if (category.Id != id)
+                throw new BusinessException($"Category id cannot be changed!");
+        }
+
     }
 
     public bool CategoryNoMustBeUnique(short categoryNo)

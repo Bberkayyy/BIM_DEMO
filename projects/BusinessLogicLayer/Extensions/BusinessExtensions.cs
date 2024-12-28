@@ -23,6 +23,7 @@ public static class BusinessExtensions
         services.AddScoped<IUserService, UserManager>();
 
         services.AddScoped<ICategoryRules, CategoryRules>();
+        services.AddScoped<IProductRules, ProductRules>();
         return services;
     }
 }

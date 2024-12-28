@@ -22,55 +22,111 @@ public class ProductRules : IProductRules
         _categoryRepository = categoryRepository;
     }
 
-    public void BarcodeNoMustBeUnique(long barcodeNo)
+    public void BarcodeNoMustBeFourteenCharacter(long barcodeNo)
+    {
+        if (barcodeNo < 10000000000000 || barcodeNo > 99999999999999)
+            throw new BusinessException($"Barcode no must be between 10000000000000 and 99999999999999. Please enter a number in this range. ({barcodeNo})");
+    }
+
+    public bool BarcodeNoMustBeUnique(long barcodeNo)
+    {
+        return _productRepository.EntityExists(x => x.BarcodeNo == barcodeNo);
+    }
+
+    public void BarcodeNoMustBeUnique(long barcodeNo, int id = -1)
     {
         Product? product = _productRepository.GetByFilter(x => x.BarcodeNo == barcodeNo);
-        if (product != null)
-            throw new BusinessException($"Barcode no is already exists! ({barcodeNo}). Enter a diffrerent");
+        if (product != null && product.Id != id)
+        {
+            if (product.BarcodeNo == barcodeNo)
+                throw new BusinessException($"Barcode no is already exists! ({barcodeNo}). Enter a different barcode no.");
+            if (product.Id != id)
+                throw new BusinessException($"Product id cannot be changed!");
+        }
     }
 
     public void CategoryExists(int categoryId)
     {
-        throw new NotImplementedException();
+        Category? category = _categoryRepository.GetByFilter(x => x.Id == categoryId);
+        if (category == null)
+            throw new BusinessException($"Category not found!");
+        if (category != null && category.Deleted != null)
+            throw new BusinessException($"Category not found! Category deleted at {category.Deleted?.ToString("yyyy-MM-dd HH:mm")}.");
     }
 
-    public void ExpirationTimeCannotBeExpired(DateTime expiration)
+    public void ExpirationTimeCannotBeExpired(DateTime? expiration)
     {
-        throw new NotImplementedException();
+        if (expiration != null)
+        {
+            if (expiration?.Day < DateTime.Now.Day)
+                if (expiration?.Month <= DateTime.Now.Month)
+                    if (expiration?.Year <= DateTime.Now.Year)
+                        throw new BusinessException($"The product has expired!");
+        }
+    }
+
+    public short GetSelectedCategoryNo(int categoryId)
+    {
+        return _categoryRepository.GetByFilter(x => x.Id == categoryId)!.CategoryNo;
     }
 
     public void NameCannotBeNullOrWhiteSpace(string name)
     {
-        throw new NotImplementedException();
+        if (string.IsNullOrWhiteSpace(name))
+            throw new BusinessException("Please enter a product name!");
     }
 
-    public void ProductDeleted(Product? product)
+    public void ProductExists(Product? product, bool isDeleteFromDatabase = false)
     {
-        throw new NotImplementedException();
+        if (product == null)
+            throw new BusinessException("Product not found!");
+        if (!isDeleteFromDatabase && product.Deleted != null)
+            throw new BusinessException($"Product not found! Product deleted at {product.Deleted?.ToString("yyyy-MM-dd HH:mm")}.");
     }
 
-    public void ProductExists(Product? product)
+    public void ProductionTimeCannotBeFuture(DateTime? production)
     {
-        throw new NotImplementedException();
+        if (production != null)
+        {
+            if (production?.Day > DateTime.Now.Day)
+                if (production?.Month >= DateTime.Now.Month)
+                    if (production?.Year >= DateTime.Now.Year)
+                        throw new BusinessException($"The product has not been produced yet.");
+        }
     }
 
-    public void ProductionTimeCannotBeFuture(DateTime expiration)
+    public void ShortCodeMustBeSevenCharacter(int shortCode)
     {
-        throw new NotImplementedException();
+        if (shortCode < 1000000 || shortCode > 9999999)
+            throw new BusinessException($"Short code must be between 1000000 and 9999999. Please enter a number in this range. ({shortCode})");
     }
 
-    public void ShortCodeMustBeUnique(int shortCode)
+    public bool ShortCodeMustBeUnique(int shortCode)
     {
-        throw new NotImplementedException();
+        return _productRepository.EntityExists(x => x.ShortCode == shortCode);
+    }
+
+    public void ShortCodeMustBeUnique(int shortCode, int id = -1)
+    {
+        Product? product = _productRepository.GetByFilter(x => x.ShortCode == shortCode);
+        if (product != null && product.Id != id)
+        {
+            if (product.BarcodeNo == shortCode)
+                throw new BusinessException($"Short code is already exists! ({shortCode}). Enter a different short code.");
+            if (product.Id != id)
+                throw new BusinessException($"Product id cannot be changed!");
+        }
     }
 
     public void StockCannotBeNegative(int stock)
     {
-        throw new NotImplementedException();
+        if (stock < 0)
+            throw new BusinessException($"Product stock cannot be negative! ({stock})");
     }
 
-    public void WeightCannotBeNegative(decimal weight)
+    public void WeightCannotBeNegative(decimal? weight)
     {
-        throw new NotImplementedException();
+        if (weight < 0)
+            throw new BusinessException($"Product weight cannot be negative! ({weight})");
     }
 }

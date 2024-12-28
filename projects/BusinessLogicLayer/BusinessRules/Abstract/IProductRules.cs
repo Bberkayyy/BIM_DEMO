@@ -9,23 +9,18 @@ namespace BusinessLogicLayer.BusinessRules.Abstract;
 
 public interface IProductRules
 {
-    void BarcodeNoMustBeUnique(long barcodeNo);
+    bool BarcodeNoMustBeUnique(long barcodeNo);
+    void BarcodeNoMustBeUnique(long barcodeNo, int id = -1);
+    void BarcodeNoMustBeFourteenCharacter(long barcodeNo);
     void CategoryExists(int categoryId);
-    void ShortCodeMustBeUnique(int shortCode);
+    bool ShortCodeMustBeUnique(int shortCode);
+    void ShortCodeMustBeUnique(int shortCode, int id = -1);
+    void ShortCodeMustBeSevenCharacter(int shortCode);
     void NameCannotBeNullOrWhiteSpace(string name);
     void StockCannotBeNegative(int stock);
-    void WeightCannotBeNegative(decimal weight);
-    void ExpirationTimeCannotBeExpired(DateTime expiration);
-    void ProductionTimeCannotBeFuture(DateTime expiration);
-    void ProductExists(Product? product);
-    void ProductDeleted(Product? product);
+    void WeightCannotBeNegative(decimal? weight);
+    void ExpirationTimeCannotBeExpired(DateTime? expiration);
+    void ProductionTimeCannotBeFuture(DateTime? production);
+    void ProductExists(Product? product, bool isDeleteFromDatabase = false);
+    short GetSelectedCategoryNo(int categoryId);
 }
-/*
-    void CategoryNoMustBeUnique(short categoryNo, int id = -1);
-    void CategoryNameMustBeUnique(string categoryName);
-    void CategoryExists(Category? category);
-    void CategoryNameCanNotBeNullOrWhiteSpace(string categoryName);
-    void CategoryDeleted(int id);
-    void CategoryDeleted(short categoryNo);
-    void CategoryDeleted(string name);
- */
