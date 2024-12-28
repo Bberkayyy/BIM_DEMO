@@ -8,13 +8,13 @@ using System.Threading.Tasks;
 
 namespace EntityLayer.Dtos.RequestDtos.CategoryRequestDtos;
 
-public record CreateCategoryRequestDto(short CategoryNo, string Name) : IRequestDto
+public record CreateCategoryRequestDto(string Name) : IRequestDto
 {
-    public static Category ConvertToEntity(CreateCategoryRequestDto createCategoryRequestDto)
+    public static Category ConvertToEntity(CreateCategoryRequestDto createCategoryRequestDto, short categoryNo)
     {
         return new Category()
         {
-            CategoryNo = createCategoryRequestDto.CategoryNo,
+            CategoryNo = categoryNo,
             Name = createCategoryRequestDto.Name,
             Created = DateTime.Now,
         };

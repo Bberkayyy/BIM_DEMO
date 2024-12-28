@@ -101,7 +101,7 @@ public class EfRepositoryBase<TContext, TEntity, TId> : IRepositoryBase<TEntity,
 
     public TEntity? GetByFilter(Expression<Func<TEntity, bool>> predicate, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? include = null)
     {
-        IQueryable<TEntity?> query = Query();
+        IQueryable<TEntity?> query = Query().AsNoTracking();
         query = query.Where(predicate!);
 
         if (include != null)
@@ -112,7 +112,7 @@ public class EfRepositoryBase<TContext, TEntity, TId> : IRepositoryBase<TEntity,
 
     public async Task<TEntity?> GetByFilterAsync(Expression<Func<TEntity, bool>> predicate, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? include = null)
     {
-        IQueryable<TEntity?> query = Query();
+        IQueryable<TEntity?> query = Query().AsNoTracking();
         query = query.Where(predicate!);
 
         if (include != null)
@@ -133,5 +133,10 @@ public class EfRepositoryBase<TContext, TEntity, TId> : IRepositoryBase<TEntity,
         Context.Set<TEntity>().Update(entity);
         await Context.SaveChangesAsync();
         return entity;
+    }
+
+    public bool EntityExists(Expression<Func<TEntity, bool>> predicate)
+    {
+        return Context.Set<TEntity>().Any(predicate);
     }
 }

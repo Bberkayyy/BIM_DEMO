@@ -1,4 +1,6 @@
 ﻿using BusinessLogicLayer.Abstract;
+using BusinessLogicLayer.BusinessRules.Abstract;
+using BusinessLogicLayer.BusinessRules.Concrete;
 using BusinessLogicLayer.Concrete;
 using DataAccessLayer.Context;
 using Microsoft.Extensions.Configuration;
@@ -19,6 +21,8 @@ public static class BusinessExtensions
         services.AddScoped<IProductService, ProductManager>();
         services.AddScoped<IStoreService, StoreManager>();
         services.AddScoped<IUserService, UserManager>();
+
+        services.AddScoped<ICategoryRules, CategoryRules>();
         return services;
     }
 }

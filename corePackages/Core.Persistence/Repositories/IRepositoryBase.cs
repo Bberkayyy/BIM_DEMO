@@ -18,4 +18,5 @@ public interface IRepositoryBase<TEntity, TId> where TEntity : EntityBase<TId>
     List<TEntity> GetAll(Expression<Func<TEntity, bool>>? predicate = null, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? include = null);
     TEntity? GetById(TId id, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? include = null);
     TEntity? GetByFilter(Expression<Func<TEntity, bool>> predicate, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? include = null);
+    bool EntityExists(Expression<Func<TEntity, bool>> predicate);
 }
