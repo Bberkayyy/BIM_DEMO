@@ -24,6 +24,7 @@ public static class BusinessExtensions
 
         services.AddScoped<ICategoryRules, CategoryRules>();
         services.AddScoped<IProductRules, ProductRules>();
+        services.AddScoped<IStoreRules, StoreRules>();
         return services;
     }
 }

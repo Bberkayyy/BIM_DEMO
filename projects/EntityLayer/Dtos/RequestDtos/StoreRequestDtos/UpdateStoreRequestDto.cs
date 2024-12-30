@@ -7,13 +7,14 @@ using System.Threading.Tasks;
 
 namespace EntityLayer.Dtos.RequestDtos.StoreRequestDtos;
 
-public record UpdateStoreRequestDto(int Id, int StoreNo, string Name, string Address, int PhoneNumber, DateTime Created)
+public record UpdateStoreRequestDto(int Id, string City, string StoreNo, string Name, string Address, string PhoneNumber, DateTime Created)
 {
     public static Store ConvertToEntity(UpdateStoreRequestDto updateStoreRequestDto)
     {
         return new Store()
         {
             Id = updateStoreRequestDto.Id,
+            City = updateStoreRequestDto.City,
             StoreNo = updateStoreRequestDto.StoreNo,
             Name = updateStoreRequestDto.Name,
             Address = updateStoreRequestDto.Address,

@@ -9,10 +9,11 @@ namespace EntityLayer.Entities;
 
 public class Store : EntityBase<int>
 {
-    public int StoreNo { get; set; }
+    public string City { get; set; } = null!;
+    public string StoreNo { get; set; } = null!;
     public string Name { get; set; } = null!;
     public string Address { get; set; } = null!;
-    public int PhoneNumber { get; set; }
+    public string PhoneNumber { get; set; } = null!;
 
     public ICollection<User> Users { get; set; } = new List<User>();
 }

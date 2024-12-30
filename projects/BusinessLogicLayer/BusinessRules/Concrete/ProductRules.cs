@@ -38,10 +38,10 @@ public class ProductRules : IProductRules
         Product? product = _productRepository.GetByFilter(x => x.BarcodeNo == barcodeNo);
         if (product != null && product.Id != id)
         {
-            if (product.BarcodeNo == barcodeNo)
-                throw new BusinessException($"Barcode no is already exists! ({barcodeNo}). Enter a different barcode no.");
             if (product.Id != id)
                 throw new BusinessException($"Product id cannot be changed!");
+            if (product.BarcodeNo == barcodeNo)
+                throw new BusinessException($"Barcode no is already exists! ({barcodeNo}). Enter a different barcode no.");
         }
     }
 
@@ -76,6 +76,12 @@ public class ProductRules : IProductRules
             throw new BusinessException("Please enter a product name!");
     }
 
+    public void PriceCannotBeNegative(decimal price)
+    {
+        if (price < 0)
+            throw new BusinessException($"Product price cannot be negative! ({price})");
+    }
+
     public void ProductExists(Product? product, bool isDeleteFromDatabase = false)
     {
         if (product == null)
@@ -101,6 +107,15 @@ public class ProductRules : IProductRules
             throw new BusinessException($"Short code must be between 1000000 and 9999999. Please enter a number in this range. ({shortCode})");
     }
 
+    public void ShortCodeShouldStartWithCategoryNo(int shortCode, int categoryId)
+    {
+        string categoryNoInShortCode = shortCode.ToString()[..3];
+        short categoryNo = GetSelectedCategoryNo(categoryId);
+
+        if (categoryNo.ToString() != categoryNoInShortCode)
+            throw new BusinessException($"Short code should start with category no! ({categoryNo}-{categoryNoInShortCode})");
+    }
+
     public bool ShortCodeMustBeUnique(int shortCode)
     {
         return _productRepository.EntityExists(x => x.ShortCode == shortCode);
@@ -111,10 +126,10 @@ public class ProductRules : IProductRules
         Product? product = _productRepository.GetByFilter(x => x.ShortCode == shortCode);
         if (product != null && product.Id != id)
         {
-            if (product.BarcodeNo == shortCode)
-                throw new BusinessException($"Short code is already exists! ({shortCode}). Enter a different short code.");
             if (product.Id != id)
                 throw new BusinessException($"Product id cannot be changed!");
+            if (product.ShortCode == shortCode)
+                throw new BusinessException($"Short code is already exists! ({shortCode}). Enter a different short code.");
         }
     }
 
@@ -128,5 +143,16 @@ public class ProductRules : IProductRules
     {
         if (weight < 0)
             throw new BusinessException($"Product weight cannot be negative! ({weight})");
+    }
+
+    public void BarcodeNoShouldStartWithEightAndLastSevenCharacterShouldBeShortCode(long barcodeNo, int shortCode)
+    {
+        string barcodeFirstCharacter = barcodeNo.ToString()[..1];
+        string barcodeLastSevenCharacter = barcodeNo.ToString().Substring(7, 7);
+
+        if (barcodeFirstCharacter != "8")
+            throw new BusinessException($"Barcode no should start with eight! ({barcodeFirstCharacter})");
+        if (barcodeLastSevenCharacter != shortCode.ToString())
+            throw new BusinessException($"Barcode no last seven character should be short code!");
     }
 }

@@ -7,11 +7,12 @@ using System.Threading.Tasks;
 
 namespace EntityLayer.Dtos.ResponseDtos.StoreResponseDtos;
 
-public record ResultStoreResponseDto(int Id, int StoreNo, string Name, string Address, int PhoneNumber, DateTime Created, DateTime? Updated, DateTime? Deleted, int UserCount)
+public record ResultStoreResponseDto(int Id, string City, string StoreNo, string Name, string Address, string PhoneNumber, DateTime Created, DateTime? Updated, DateTime? Deleted, int UserCount)
 {
     public static ResultStoreResponseDto ConvertToResponse(Store entity)
     {
         return new ResultStoreResponseDto(Id: entity.Id,
+                                          City: entity.City,
                                           StoreNo: entity.StoreNo,
                                           Name: entity.Name,
                                           Address: entity.Address,

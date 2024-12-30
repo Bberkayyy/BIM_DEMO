@@ -18,7 +18,7 @@ public static class GenerateClass
         for (int i = 0; i < 6; i++)
             randomDigits += random.Next(0, 10).ToString();
         string lastDigits = shorCode.ToString();
-        do { barcodeNo = long.Parse(firstDigit + randomDigits + lastDigits); } 
+        do { barcodeNo = long.Parse(firstDigit + randomDigits + lastDigits); }
         while (productRules.BarcodeNoMustBeUnique(barcodeNo));
         return barcodeNo;
     }
@@ -36,5 +36,12 @@ public static class GenerateClass
         do { categoryNo = (short)random.Next(100, 1000); }
         while (categoryRules.CategoryNoMustBeUnique(categoryNo));
         return categoryNo;
+    }
+    public static string GenerateStoreNo(this IStoreRules storeRules, int cityCode)
+    {
+        string formattedCityCode = cityCode.ToString("D2");
+        string storeNo;
+        do { storeNo = formattedCityCode + random.Next(1000, 10000).ToString(); } while (storeRules.StoreNoMustBeUnique(storeNo));
+        return storeNo;
     }
 }

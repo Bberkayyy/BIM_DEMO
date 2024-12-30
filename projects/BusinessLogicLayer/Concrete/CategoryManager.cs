@@ -319,7 +319,7 @@ public class CategoryManager : ICategoryService
 
     public Response<List<ResultCategoryResponseDto>> TGetAll(Expression<Func<Category, bool>>? predicate = null, Func<IQueryable<Category>, IIncludableQueryable<Category, object>>? include = null)
     {
-        List<Category> categories = _categoryRepository.GetAll(x => x.Deleted == null, x => x.Include(x => x.Products));
+        List<Category> categories = _categoryRepository.GetAll(predicate ?? (x => x.Deleted == null), include ?? (x => x.Include(x => x.Products)));
         List<ResultCategoryResponseDto> response = categories.Select(x => ResultCategoryResponseDto.ConvertToResponse(x)).ToList();
         return new Response<List<ResultCategoryResponseDto>>()
         {
@@ -330,7 +330,7 @@ public class CategoryManager : ICategoryService
 
     public async Task<Response<List<ResultCategoryResponseDto>>> TGetAllAsync(Expression<Func<Category, bool>>? predicate = null, Func<IQueryable<Category>, IIncludableQueryable<Category, object>>? include = null)
     {
-        List<Category> categories = await _categoryRepository.GetAllAsync(x => x.Deleted == null, include: x => x.Include(x => x.Products));
+        List<Category> categories = await _categoryRepository.GetAllAsync(predicate ?? (x => x.Deleted == null), include ?? (x => x.Include(x => x.Products)));
         List<ResultCategoryResponseDto> response = categories.Select(x => ResultCategoryResponseDto.ConvertToResponse(x)).ToList();
         return new Response<List<ResultCategoryResponseDto>>()
         {

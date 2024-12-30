@@ -7,13 +7,14 @@ using System.Threading.Tasks;
 
 namespace EntityLayer.Dtos.RequestDtos.StoreRequestDtos;
 
-public record CreateStoreRequestDto(int StoreNo, string Name, string Address, int PhoneNumber)
+public record CreateStoreRequestDto(string City, string Name, string Address, string PhoneNumber)
 {
-    public static Store ConvertToEntity(CreateStoreRequestDto createStoreRequestDto)
+    public static Store ConvertToEntity(CreateStoreRequestDto createStoreRequestDto, string storeNo)
     {
         return new Store()
         {
-            StoreNo = createStoreRequestDto.StoreNo,
+            City = createStoreRequestDto.City,
+            StoreNo = storeNo,
             Name = createStoreRequestDto.Name,
             Address = createStoreRequestDto.Address,
             PhoneNumber = createStoreRequestDto.PhoneNumber,

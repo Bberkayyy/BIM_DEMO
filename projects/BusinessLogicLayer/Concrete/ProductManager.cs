@@ -39,10 +39,10 @@ public class ProductManager : IProductService
             long barcodeNo = GenerateClass.GenerateRandomUniqueBarcodeNo(_rules, shortCode);
             _rules.NameCannotBeNullOrWhiteSpace(createProductRequestDto.Name);
             _rules.StockCannotBeNegative(createProductRequestDto.Stock);
+            _rules.PriceCannotBeNegative(createProductRequestDto.Price);
             _rules.WeightCannotBeNegative(createProductRequestDto.Weight);
             _rules.ExpirationTimeCannotBeExpired(createProductRequestDto.Expiration);
             _rules.ProductionTimeCannotBeFuture(createProductRequestDto.Production);
-
             Product createProduct = CreateProductRequestDto.ConvertToEntity(createProductRequestDto, shortCode, barcodeNo);
             Product createdProduct = _productRepository.Create(createProduct);
             ResultProductResponseDto response = ResultProductResponseDto.ConvertToResponse(createdProduct);
@@ -73,6 +73,7 @@ public class ProductManager : IProductService
             long barcodeNo = GenerateClass.GenerateRandomUniqueBarcodeNo(_rules, shortCode);
             _rules.NameCannotBeNullOrWhiteSpace(createProductRequestDto.Name);
             _rules.StockCannotBeNegative(createProductRequestDto.Stock);
+            _rules.PriceCannotBeNegative(createProductRequestDto.Price);
             _rules.WeightCannotBeNegative(createProductRequestDto.Weight);
             _rules.ExpirationTimeCannotBeExpired(createProductRequestDto.Expiration);
             _rules.ProductionTimeCannotBeFuture(createProductRequestDto.Production);
@@ -382,7 +383,7 @@ public class ProductManager : IProductService
 
     public Response<List<ResultProductResponseDto>> TGetAll(Expression<Func<Product, bool>>? predicate = null, Func<IQueryable<Product>, IIncludableQueryable<Product, object>>? include = null)
     {
-        List<Product> products = _productRepository.GetAll(x => x.Deleted == null, x => x.Include(x => x.Category));
+        List<Product> products = _productRepository.GetAll(predicate ?? (x => x.Deleted == null), include ?? (x => x.Include(x => x.Category)));
         List<ResultProductResponseDto> response = products.Select(x => ResultProductResponseDto.ConvertToResponse(x)).ToList();
         return new Response<List<ResultProductResponseDto>>()
         {
@@ -393,7 +394,7 @@ public class ProductManager : IProductService
 
     public async Task<Response<List<ResultProductResponseDto>>> TGetAllAsync(Expression<Func<Product, bool>>? predicate = null, Func<IQueryable<Product>, IIncludableQueryable<Product, object>>? include = null)
     {
-        List<Product> products = await _productRepository.GetAllAsync(x => x.Deleted == null, x => x.Include(x => x.Category));
+        List<Product> products = await _productRepository.GetAllAsync(predicate ?? (x => x.Deleted == null), include ?? (x => x.Include(x => x.Category)));
         List<ResultProductResponseDto> response = products.Select(x => ResultProductResponseDto.ConvertToResponse(x)).ToList();
         return new Response<List<ResultProductResponseDto>>()
         {
@@ -499,12 +500,15 @@ public class ProductManager : IProductService
         try
         {
             _rules.CategoryExists(updateProductRequestDto.CategoryId);
-            _rules.BarcodeNoMustBeFourteenCharacter(updateProductRequestDto.BarcodeNo);
-            _rules.BarcodeNoMustBeUnique(updateProductRequestDto.BarcodeNo, updateProductRequestDto.Id);
             _rules.ShortCodeMustBeSevenCharacter(updateProductRequestDto.ShortCode);
+            _rules.ShortCodeShouldStartWithCategoryNo(updateProductRequestDto.ShortCode, updateProductRequestDto.CategoryId);
             _rules.ShortCodeMustBeUnique(updateProductRequestDto.ShortCode, updateProductRequestDto.Id);
+            _rules.BarcodeNoMustBeFourteenCharacter(updateProductRequestDto.BarcodeNo);
+            _rules.BarcodeNoShouldStartWithEightAndLastSevenCharacterShouldBeShortCode(updateProductRequestDto.BarcodeNo, updateProductRequestDto.ShortCode);
+            _rules.BarcodeNoMustBeUnique(updateProductRequestDto.BarcodeNo, updateProductRequestDto.Id);
             _rules.NameCannotBeNullOrWhiteSpace(updateProductRequestDto.Name);
             _rules.StockCannotBeNegative(updateProductRequestDto.Stock);
+            _rules.PriceCannotBeNegative(updateProductRequestDto.Price);
             _rules.WeightCannotBeNegative(updateProductRequestDto.Weight);
             _rules.ExpirationTimeCannotBeExpired(updateProductRequestDto.Expiration);
             _rules.ProductionTimeCannotBeFuture(updateProductRequestDto.Production);
@@ -533,12 +537,15 @@ public class ProductManager : IProductService
         try
         {
             _rules.CategoryExists(updateProductRequestDto.CategoryId);
-            _rules.BarcodeNoMustBeFourteenCharacter(updateProductRequestDto.BarcodeNo);
-            _rules.BarcodeNoMustBeUnique(updateProductRequestDto.BarcodeNo, updateProductRequestDto.Id);
             _rules.ShortCodeMustBeSevenCharacter(updateProductRequestDto.ShortCode);
+            _rules.ShortCodeShouldStartWithCategoryNo(updateProductRequestDto.ShortCode, updateProductRequestDto.CategoryId);
             _rules.ShortCodeMustBeUnique(updateProductRequestDto.ShortCode, updateProductRequestDto.Id);
+            _rules.BarcodeNoMustBeFourteenCharacter(updateProductRequestDto.BarcodeNo);
+            _rules.BarcodeNoShouldStartWithEightAndLastSevenCharacterShouldBeShortCode(updateProductRequestDto.BarcodeNo, updateProductRequestDto.ShortCode);
+            _rules.BarcodeNoMustBeUnique(updateProductRequestDto.BarcodeNo, updateProductRequestDto.Id);
             _rules.NameCannotBeNullOrWhiteSpace(updateProductRequestDto.Name);
             _rules.StockCannotBeNegative(updateProductRequestDto.Stock);
+            _rules.PriceCannotBeNegative(updateProductRequestDto.Price);
             _rules.WeightCannotBeNegative(updateProductRequestDto.Weight);
             _rules.ExpirationTimeCannotBeExpired(updateProductRequestDto.Expiration);
             _rules.ProductionTimeCannotBeFuture(updateProductRequestDto.Production);
