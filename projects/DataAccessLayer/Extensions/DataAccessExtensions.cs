@@ -1,8 +1,10 @@
 ﻿using DataAccessLayer.Context;
 using DataAccessLayer.Repositories.CategoryRepositories;
 using DataAccessLayer.Repositories.ProductRepositories;
+using DataAccessLayer.Repositories.RoleRepositories;
 using DataAccessLayer.Repositories.StoreRepositories;
 using DataAccessLayer.Repositories.UserRepositories;
+using DataAccessLayer.Repositories.UserRoleRepositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,6 +26,8 @@ public static class DataAccessExtensions
         services.AddScoped<IProductRepository, ProductRepository>();
         services.AddScoped<IStoreRepository, StoreRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IRoleRepository, RoleRepository>();
+        services.AddScoped<IUserRoleRepository, UserRoleRepository>();
         return services;
     }
 }

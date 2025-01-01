@@ -8,13 +8,14 @@ using System.Threading.Tasks;
 
 namespace EntityLayer.Dtos.ResponseDtos.UserResponseDtos;
 
-public record ResultUserResponseDto(int Id, string Name, string Surname, int UserCode, int Password, DateTime Created, DateTime? Updated, DateTime? Deleted, ResultStoreResponseDto? Store)
+public record ResultUserResponseDto(int Id, string Name, string Surname, string IdentityNumber, int UserCode, int Password, DateTime Created, DateTime? Updated, DateTime? Deleted, ResultStoreResponseDto? Store)
 {
     public static ResultUserResponseDto ConvertToResponsed(User entity)
     {
         return new ResultUserResponseDto(Id: entity.Id,
                                          Name: entity.Name,
                                          Surname: entity.Surname,
+                                         IdentityNumber: entity.IdentityNumber,
                                          UserCode: entity.UserCode,
                                          Password: entity.Password,
                                          Created: entity.Created,

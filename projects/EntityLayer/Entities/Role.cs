@@ -7,15 +7,9 @@ using System.Threading.Tasks;
 
 namespace EntityLayer.Entities;
 
-public class User : EntityBase<int>
+public class Role : EntityBase<int>
 {
-    public int StoreId { get; set; }
-    public Store Store { get; set; } = null!;
     public string Name { get; set; } = null!;
-    public string Surname { get; set; } = null!;
-    public string IdentityNumber { get; set; } = null!;
-    public int UserCode { get; set; }
-    public int Password { get; set; }
 
     public ICollection<UserRole> UserRoles { get; set; } = new HashSet<UserRole>();
 }

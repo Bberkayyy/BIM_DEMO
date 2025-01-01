@@ -21,10 +21,15 @@ public static class BusinessExtensions
         services.AddScoped<IProductService, ProductManager>();
         services.AddScoped<IStoreService, StoreManager>();
         services.AddScoped<IUserService, UserManager>();
+        services.AddScoped<IRoleService, RoleManager>();
+        services.AddScoped<IUserRoleService, UserRoleManager>();
 
         services.AddScoped<ICategoryRules, CategoryRules>();
         services.AddScoped<IProductRules, ProductRules>();
         services.AddScoped<IStoreRules, StoreRules>();
+        services.AddScoped<IRoleRules, RoleRules>();
+        services.AddScoped<IUserRoleRules, UserRoleRules>();
+        services.AddScoped<IUserRules, UserRules>();
         return services;
     }
 }

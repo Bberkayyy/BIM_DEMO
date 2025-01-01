@@ -10,6 +10,7 @@ namespace BusinessLogicLayer.BusinessRules.Abstract;
 public interface IStoreRules
 {
     bool StoreNoMustBeUnique(string storeNo);
+    void StoreNoMustBeDigit(string storeNo);
     void StoreNoMustBeUnique(string storeNo, int id = -1);
     void StoreNoMustBeSixCharacter(string storeNo);
     void NameMustBeUnique(string name, int id = -1);
@@ -21,6 +22,7 @@ public interface IStoreRules
     void NameCannotBeNullOrWhiteSpace(string name);
     void AddressCannotBeNullOrWhiteSpace(string address);
     void PhoneNumberCannotBeNullOrWhiteSpace(string phoneNumber);
+    void PhoneNumberMustBeDigit(string phoneNumber);
     void CityCannotBeNullOrWhiteSpace(string city);
     int GetCityCode(string city);
 }

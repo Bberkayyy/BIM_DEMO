@@ -450,12 +450,14 @@ public class StoreManager : IStoreService
         try
         {
             _rules.StoreNoMustBeSixCharacter(updateStoreRequestDto.StoreNo);
+            _rules.StoreNoMustBeDigit(updateStoreRequestDto.StoreNo);
             _rules.IsStoreNoValid(updateStoreRequestDto.StoreNo, updateStoreRequestDto.City);
             _rules.StoreNoMustBeUnique(updateStoreRequestDto.StoreNo, updateStoreRequestDto.Id);
             _rules.NameCannotBeNullOrWhiteSpace(updateStoreRequestDto.Name);
             _rules.NameMustBeUnique(updateStoreRequestDto.Name, updateStoreRequestDto.Id);
             _rules.PhoneNumberCannotBeNullOrWhiteSpace(updateStoreRequestDto.PhoneNumber);
             _rules.PhoneNumberMustBeElevenCharacter(updateStoreRequestDto.PhoneNumber);
+            _rules.PhoneNumberMustBeDigit(updateStoreRequestDto.PhoneNumber);
             _rules.AddressCannotBeNullOrWhiteSpace(updateStoreRequestDto.Address);
             _rules.AddressMustBeMinTwentyCharacter(updateStoreRequestDto.Address);
             Store updateStore = UpdateStoreRequestDto.ConvertToEntity(updateStoreRequestDto);

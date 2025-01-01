@@ -130,6 +130,19 @@ public class StoreRules : IStoreRules
             return (int)cityCodeExists.Value;
         throw new BusinessException("Enter a valid city name!");
     }
+
+    public void StoreNoMustBeDigit(string storeNo)
+    {
+        if (!storeNo.All(char.IsDigit))
+            throw new BusinessException("Store no must consist of digit only!");
+    }
+
+    public void PhoneNumberMustBeDigit(string phoneNumber)
+    {
+        if (!phoneNumber.All(char.IsDigit))
+            throw new BusinessException("Phone number must consist of digit only!");
+    }
+
     private readonly Dictionary<string, CityCodes> cityAliases = new(StringComparer.OrdinalIgnoreCase)
     {
         {"afyon",CityCodes.Afyonkarahisar },

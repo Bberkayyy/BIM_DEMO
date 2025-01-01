@@ -44,4 +44,15 @@ public static class GenerateClass
         do { storeNo = formattedCityCode + random.Next(1000, 10000).ToString(); } while (storeRules.StoreNoMustBeUnique(storeNo));
         return storeNo;
     }
+    public static int GenerateRandomUniqueUserCode(this IUserRules userRules)
+    {
+        int userCode;
+        do { userCode = random.Next(100000, 1000000); }
+        while (userRules.UserCodeMustBeUnique(userCode));
+        return userCode;
+    }
+    public static int GenerateRandomUserPassword()
+    {
+        return random.Next(10000000, 100000000);
+    }
 }

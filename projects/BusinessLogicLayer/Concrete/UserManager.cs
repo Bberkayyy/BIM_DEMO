@@ -1,4 +1,6 @@
 ﻿using BusinessLogicLayer.Abstract;
+using BusinessLogicLayer.BusinessRules.Abstract;
+using BusinessLogicLayer.Extensions;
 using Core.Shared;
 using DataAccessLayer.Repositories.UserRepositories;
 using EntityLayer.Dtos.RequestDtos.UserRequestDtos;
@@ -18,152 +20,277 @@ namespace BusinessLogicLayer.Concrete;
 public class UserManager : IUserService
 {
     private readonly IUserRepository _userRepository;
+    private readonly IUserRules _rules;
 
-    public UserManager(IUserRepository userRepository)
+    public UserManager(IUserRepository userRepository, IUserRules rules)
     {
         _userRepository = userRepository;
+        _rules = rules;
     }
 
     public Response<ResultUserResponseDto> TCreate(CreateUserRequestDto createUserRequestDto)
     {
-        User createUser = CreateUserRequestDto.ConvertToEntity(createUserRequestDto);
-        User createdUser = _userRepository.Create(createUser);
-        ResultUserResponseDto response = ResultUserResponseDto.ConvertToResponsed(createdUser);
-        return new Response<ResultUserResponseDto>()
+        try
         {
-            Data = response,
-            Message = "User created successfully!",
-            StatusCode = System.Net.HttpStatusCode.Created
-        };
+            _rules.StoreExists(createUserRequestDto.StoreId);
+            _rules.IdentityNumberMustBeElevenCharacter(createUserRequestDto.IdentityNumber);
+            _rules.IdentityNumberMustBeDigit(createUserRequestDto.IdentityNumber);
+            _rules.IdentityNumberMustBeUnique(createUserRequestDto.IdentityNumber);
+            int userCode = GenerateClass.GenerateRandomUniqueUserCode(_rules);
+            int password = GenerateClass.GenerateRandomUserPassword();
+            User createUser = CreateUserRequestDto.ConvertToEntity(createUserRequestDto, userCode, password);
+            User createdUser = _userRepository.Create(createUser);
+            ResultUserResponseDto response = ResultUserResponseDto.ConvertToResponsed(createdUser);
+            return new Response<ResultUserResponseDto>()
+            {
+                Data = response,
+                Message = "User created successfully!",
+                StatusCode = System.Net.HttpStatusCode.Created
+            };
+        }
+        catch (Exception e)
+        {
+            return new Response<ResultUserResponseDto>
+            {
+                Message = e.Message,
+                StatusCode = System.Net.HttpStatusCode.BadRequest
+            };
+        }
+
     }
 
     public async Task<Response<ResultUserResponseDto>> TCreateAsync(CreateUserRequestDto createUserRequestDto)
     {
-        User createUser = CreateUserRequestDto.ConvertToEntity(createUserRequestDto);
-        User createdUser = await _userRepository.CreateAsync(createUser);
-        ResultUserResponseDto response = ResultUserResponseDto.ConvertToResponsed(createdUser);
-        return new Response<ResultUserResponseDto>()
+        try
         {
-            Data = response,
-            Message = "User created successfully!",
-            StatusCode = System.Net.HttpStatusCode.Created
-        };
+            _rules.StoreExists(createUserRequestDto.StoreId);
+            _rules.IdentityNumberMustBeElevenCharacter(createUserRequestDto.IdentityNumber);
+            _rules.IdentityNumberMustBeDigit(createUserRequestDto.IdentityNumber);
+            _rules.IdentityNumberMustBeUnique(createUserRequestDto.IdentityNumber);
+            int userCode = GenerateClass.GenerateRandomUniqueUserCode(_rules);
+            int password = GenerateClass.GenerateRandomUserPassword();
+            User createUser = CreateUserRequestDto.ConvertToEntity(createUserRequestDto, userCode, password);
+            User createdUser = await _userRepository.CreateAsync(createUser);
+            ResultUserResponseDto response = ResultUserResponseDto.ConvertToResponsed(createdUser);
+            return new Response<ResultUserResponseDto>()
+            {
+                Data = response,
+                Message = "User created successfully!",
+                StatusCode = System.Net.HttpStatusCode.Created
+            };
+        }
+        catch (Exception e)
+        {
+            return new Response<ResultUserResponseDto>
+            {
+                Message = e.Message,
+                StatusCode = System.Net.HttpStatusCode.BadRequest
+            };
+        }
     }
 
     public Response<ResultUserResponseDto> TDeleteById(int id)
     {
-        User? user = _userRepository.GetByFilter(x => x.Id == id, x => x.Include(x => x.Store));
-        if (user != null)
+        try
         {
-            user.Deleted = DateTime.Now;
+            User? user = _userRepository.GetByFilter(x => x.Id == id, x => x.Include(x => x.Store));
+            _rules.UserExists(user);
+            user!.Deleted = DateTime.Now;
             _userRepository.Delete(user);
+            ResultUserResponseDto response = ResultUserResponseDto.ConvertToResponsed(user);
+            return new Response<ResultUserResponseDto>()
+            {
+                Data = response,
+                Message = "User deleted successfully!",
+                StatusCode = System.Net.HttpStatusCode.NoContent
+            };
         }
-        return new Response<ResultUserResponseDto>()
+        catch (Exception e)
         {
-            Data = user != null ? ResultUserResponseDto.ConvertToResponsed(user) : null,
-            Message = user != null ? "User deleted successfully!" : "User not found",
-            StatusCode = System.Net.HttpStatusCode.NoContent
-        };
+            return new Response<ResultUserResponseDto>
+            {
+                Message = e.Message,
+                StatusCode = System.Net.HttpStatusCode.NotFound
+            };
+        }
     }
 
     public async Task<Response<ResultUserResponseDto>> TDeleteByIdAsync(int id)
     {
-        User? user = await _userRepository.GetByFilterAsync(x => x.Id == id, x => x.Include(x => x.Store));
-        if (user != null)
+        try
         {
-            user.Deleted = DateTime.Now;
+            User? user = await _userRepository.GetByFilterAsync(x => x.Id == id, x => x.Include(x => x.Store));
+            _rules.UserExists(user);
+            user!.Deleted = DateTime.Now;
             await _userRepository.DeleteAsync(user);
+            ResultUserResponseDto response = ResultUserResponseDto.ConvertToResponsed(user);
+            return new Response<ResultUserResponseDto>()
+            {
+                Data = response,
+                Message = "User deleted successfully!",
+                StatusCode = System.Net.HttpStatusCode.NoContent
+            };
         }
-        return new Response<ResultUserResponseDto>()
+        catch (Exception e)
         {
-            Data = user != null ? ResultUserResponseDto.ConvertToResponsed(user) : null,
-            Message = user != null ? "User deleted successfully!" : "User not found",
-            StatusCode = System.Net.HttpStatusCode.NoContent
-        };
+            return new Response<ResultUserResponseDto>
+            {
+                Message = e.Message,
+                StatusCode = System.Net.HttpStatusCode.NotFound
+            };
+        }
     }
 
     public Response<ResultUserResponseDto> TDeleteByUserCode(int userCode)
     {
-        User? user = _userRepository.GetByFilter(x => x.UserCode == userCode, x => x.Include(x => x.Store));
-        if (user != null)
+        try
         {
-            user.Deleted = DateTime.Now;
+            User? user = _userRepository.GetByFilter(x => x.UserCode == userCode, x => x.Include(x => x.Store));
+            _rules.UserExists(user);
+            user!.Deleted = DateTime.Now;
             _userRepository.Delete(user);
+            ResultUserResponseDto response = ResultUserResponseDto.ConvertToResponsed(user);
+            return new Response<ResultUserResponseDto>()
+            {
+                Data = response,
+                Message = "User deleted successfully!",
+                StatusCode = System.Net.HttpStatusCode.NoContent
+            };
         }
-        return new Response<ResultUserResponseDto>()
+        catch (Exception e)
         {
-            Data = user != null ? ResultUserResponseDto.ConvertToResponsed(user) : null,
-            Message = user != null ? "User deleted successfully!" : "User not found",
-            StatusCode = System.Net.HttpStatusCode.NoContent
-        };
+            return new Response<ResultUserResponseDto>
+            {
+                Message = e.Message,
+                StatusCode = System.Net.HttpStatusCode.NotFound
+            };
+        }
     }
 
     public async Task<Response<ResultUserResponseDto>> TDeleteByUserCodeAsync(int userCode)
     {
-        User? user = await _userRepository.GetByFilterAsync(x => x.UserCode == userCode, x => x.Include(x => x.Store));
-        if (user != null)
+        try
         {
-            user.Deleted = DateTime.Now;
+            User? user = await _userRepository.GetByFilterAsync(x => x.UserCode == userCode, x => x.Include(x => x.Store));
+            _rules.UserExists(user);
+            user!.Deleted = DateTime.Now;
             await _userRepository.DeleteAsync(user);
+            ResultUserResponseDto response = ResultUserResponseDto.ConvertToResponsed(user);
+            return new Response<ResultUserResponseDto>()
+            {
+                Data = response,
+                Message = "User deleted successfully!",
+                StatusCode = System.Net.HttpStatusCode.NoContent
+            };
         }
-        return new Response<ResultUserResponseDto>()
+        catch (Exception e)
         {
-            Data = user != null ? ResultUserResponseDto.ConvertToResponsed(user) : null,
-            Message = user != null ? "User deleted successfully!" : "User not found",
-            StatusCode = System.Net.HttpStatusCode.NoContent
-        };
+            return new Response<ResultUserResponseDto>
+            {
+                Message = e.Message,
+                StatusCode = System.Net.HttpStatusCode.NotFound
+            };
+        }
     }
 
     public Response<ResultUserResponseDto> TDeleteFromDatabaseById(int id)
     {
-        User? user = _userRepository.GetByFilter(x => x.Id == id, x => x.Include(x => x.Store));
-        if (user != null)
-            _userRepository.DeleteFromDatabase(user);
-        return new Response<ResultUserResponseDto>()
+        try
         {
-            Data = user != null ? ResultUserResponseDto.ConvertToResponsed(user) : null,
-            Message = user != null ? "User deleted successfully!" : "User not found",
-            StatusCode = System.Net.HttpStatusCode.NoContent
-        };
+            User? user = _userRepository.GetByFilter(x => x.Id == id, x => x.Include(x => x.Store));
+            _rules.UserExists(user, true);
+            _userRepository.DeleteFromDatabase(user!);
+            ResultUserResponseDto response = ResultUserResponseDto.ConvertToResponsed(user!);
+            return new Response<ResultUserResponseDto>()
+            {
+                Data = response,
+                Message = "User deleted from database successfully!",
+                StatusCode = System.Net.HttpStatusCode.NoContent
+            };
+        }
+        catch (Exception e)
+        {
+            return new Response<ResultUserResponseDto>
+            {
+                Message = e.Message,
+                StatusCode = System.Net.HttpStatusCode.NotFound
+            };
+        }
     }
 
     public async Task<Response<ResultUserResponseDto>> TDeleteFromDatabaseByIdAsync(int id)
     {
-        User? user = await _userRepository.GetByFilterAsync(x => x.Id == id, x => x.Include(x => x.Store));
-        if (user != null)
-            await _userRepository.DeleteFromDatabaseAsync(user);
-        return new Response<ResultUserResponseDto>()
+        try
         {
-            Data = user != null ? ResultUserResponseDto.ConvertToResponsed(user) : null,
-            Message = user != null ? "User deleted successfully!" : "User not found",
-            StatusCode = System.Net.HttpStatusCode.NoContent
-        };
+            User? user = await _userRepository.GetByFilterAsync(x => x.Id == id, x => x.Include(x => x.Store));
+            _rules.UserExists(user, true);
+            await _userRepository.DeleteFromDatabaseAsync(user!);
+            ResultUserResponseDto response = ResultUserResponseDto.ConvertToResponsed(user!);
+            return new Response<ResultUserResponseDto>()
+            {
+                Data = response,
+                Message = "User deleted from database successfully!",
+                StatusCode = System.Net.HttpStatusCode.NoContent
+            };
+        }
+        catch (Exception e)
+        {
+            return new Response<ResultUserResponseDto>
+            {
+                Message = e.Message,
+                StatusCode = System.Net.HttpStatusCode.NotFound
+            };
+        }
     }
 
     public Response<ResultUserResponseDto> TDeleteFromDatabaseByUserCode(int userCode)
     {
-        User? user = _userRepository.GetByFilter(x => x.UserCode == userCode, x => x.Include(x => x.Store));
-        if (user != null)
-            _userRepository.DeleteFromDatabase(user);
-        return new Response<ResultUserResponseDto>()
+        try
         {
-            Data = user != null ? ResultUserResponseDto.ConvertToResponsed(user) : null,
-            Message = user != null ? "User deleted successfully!" : "User not found",
-            StatusCode = System.Net.HttpStatusCode.NoContent
-        };
+            User? user = _userRepository.GetByFilter(x => x.UserCode == userCode, x => x.Include(x => x.Store));
+            _rules.UserExists(user, true);
+            _userRepository.DeleteFromDatabase(user!);
+            ResultUserResponseDto response = ResultUserResponseDto.ConvertToResponsed(user!);
+            return new Response<ResultUserResponseDto>()
+            {
+                Data = response,
+                Message = "User deleted from database successfully!",
+                StatusCode = System.Net.HttpStatusCode.NoContent
+            };
+        }
+        catch (Exception e)
+        {
+            return new Response<ResultUserResponseDto>
+            {
+                Message = e.Message,
+                StatusCode = System.Net.HttpStatusCode.NotFound
+            };
+        }
     }
 
     public async Task<Response<ResultUserResponseDto>> TDeleteFromDatabaseByUserCodeAsync(int userCode)
     {
-        User? user = await _userRepository.GetByFilterAsync(x => x.UserCode == userCode, x => x.Include(x => x.Store));
-        if (user != null)
-            await _userRepository.DeleteFromDatabaseAsync(user);
-        return new Response<ResultUserResponseDto>()
+        try
         {
-            Data = user != null ? ResultUserResponseDto.ConvertToResponsed(user) : null,
-            Message = user != null ? "User deleted successfully!" : "User not found",
-            StatusCode = System.Net.HttpStatusCode.NoContent
-        };
+            User? user = await _userRepository.GetByFilterAsync(x => x.UserCode == userCode, x => x.Include(x => x.Store));
+            _rules.UserExists(user, true);
+            await _userRepository.DeleteFromDatabaseAsync(user!);
+            ResultUserResponseDto response = ResultUserResponseDto.ConvertToResponsed(user!);
+            return new Response<ResultUserResponseDto>()
+            {
+                Data = response,
+                Message = "User deleted from database successfully!",
+                StatusCode = System.Net.HttpStatusCode.NoContent
+            };
+        }
+        catch (Exception e)
+        {
+            return new Response<ResultUserResponseDto>
+            {
+                Message = e.Message,
+                StatusCode = System.Net.HttpStatusCode.NotFound
+            };
+        }
     }
 
     public Response<List<ResultUserResponseDto>> TGetAll(Expression<Func<User, bool>>? predicate = null, Func<IQueryable<User>, IIncludableQueryable<User, object>>? include = null)
@@ -190,67 +317,153 @@ public class UserManager : IUserService
 
     public Response<ResultUserResponseDto> TGetByFilter(Expression<Func<User, bool>> predicate, Func<IQueryable<User>, IIncludableQueryable<User, object>>? include = null)
     {
-        User? user = _userRepository.GetByFilter(predicate, include);
-        return new Response<ResultUserResponseDto>()
+        try
         {
-            Data = user != null ? ResultUserResponseDto.ConvertToResponsed(user) : null,
-            StatusCode = System.Net.HttpStatusCode.OK
-        };
+            User? user = _userRepository.GetByFilter(predicate, include);
+            _rules.UserExists(user);
+            ResultUserResponseDto response = ResultUserResponseDto.ConvertToResponsed(user!);
+            return new Response<ResultUserResponseDto>()
+            {
+                Data = response,
+                StatusCode = System.Net.HttpStatusCode.OK
+            };
+        }
+        catch (Exception e)
+        {
+            return new Response<ResultUserResponseDto>
+            {
+                Message = e.Message,
+                StatusCode = System.Net.HttpStatusCode.NotFound
+            };
+        }
     }
 
     public async Task<Response<ResultUserResponseDto>> TGetByFilterAsync(Expression<Func<User, bool>> predicate, Func<IQueryable<User>, IIncludableQueryable<User, object>>? include = null)
     {
-        User? user = await _userRepository.GetByFilterAsync(predicate, include);
-        return new Response<ResultUserResponseDto>()
+        try
         {
-            Data = user != null ? ResultUserResponseDto.ConvertToResponsed(user) : null,
-            StatusCode = System.Net.HttpStatusCode.OK
-        };
+            User? user = await _userRepository.GetByFilterAsync(predicate, include);
+            _rules.UserExists(user);
+            ResultUserResponseDto response = ResultUserResponseDto.ConvertToResponsed(user!);
+            return new Response<ResultUserResponseDto>()
+            {
+                Data = response,
+                StatusCode = System.Net.HttpStatusCode.OK
+            };
+        }
+        catch (Exception e)
+        {
+            return new Response<ResultUserResponseDto>
+            {
+                Message = e.Message,
+                StatusCode = System.Net.HttpStatusCode.NotFound
+            };
+        }
     }
 
     public Response<ResultUserResponseDto> TGetById(int id, Func<IQueryable<User>, IIncludableQueryable<User, object>>? include = null)
     {
-        User? user = _userRepository.GetById(id, include);
-        return new Response<ResultUserResponseDto>()
+        try
         {
-            Data = user != null ? ResultUserResponseDto.ConvertToResponsed(user) : null,
-            StatusCode = System.Net.HttpStatusCode.OK
-        };
+            User? user = _userRepository.GetById(id, include);
+            _rules.UserExists(user);
+            ResultUserResponseDto response = ResultUserResponseDto.ConvertToResponsed(user!);
+            return new Response<ResultUserResponseDto>()
+            {
+                Data = response,
+                StatusCode = System.Net.HttpStatusCode.OK
+            };
+        }
+        catch (Exception e)
+        {
+            return new Response<ResultUserResponseDto>
+            {
+                Message = e.Message,
+                StatusCode = System.Net.HttpStatusCode.NotFound
+            };
+        }
     }
 
     public async Task<Response<ResultUserResponseDto>> TGetByIdAsync(int id, Func<IQueryable<User>, IIncludableQueryable<User, object>>? include = null)
     {
-        User? user = await _userRepository.GetByIdAsync(id, include);
-        return new Response<ResultUserResponseDto>()
+        try
         {
-            Data = user != null ? ResultUserResponseDto.ConvertToResponsed(user) : null,
-            StatusCode = System.Net.HttpStatusCode.OK
-        };
+            User? user = await _userRepository.GetByIdAsync(id, include);
+            _rules.UserExists(user);
+            ResultUserResponseDto response = ResultUserResponseDto.ConvertToResponsed(user!);
+            return new Response<ResultUserResponseDto>()
+            {
+                Data = response,
+                StatusCode = System.Net.HttpStatusCode.OK
+            };
+        }
+        catch (Exception e)
+        {
+            return new Response<ResultUserResponseDto>
+            {
+                Message = e.Message,
+                StatusCode = System.Net.HttpStatusCode.NotFound
+            };
+        }
     }
 
     public Response<ResultUserResponseDto> TUpdate(UpdateUserRequestDto updateUserRequestDto)
     {
-        User updateUser = UpdateUserRequestDto.ConvertToEntity(updateUserRequestDto);
-        User updatedUser = _userRepository.Update(updateUser);
-        ResultUserResponseDto response = ResultUserResponseDto.ConvertToResponsed(updatedUser);
-        return new Response<ResultUserResponseDto>()
+        try
         {
-            Data = response,
-            Message = " User updated successfully!",
-            StatusCode = System.Net.HttpStatusCode.OK
-        };
+            _rules.StoreExists(updateUserRequestDto.StoreId);
+            _rules.IdentityNumberMustBeElevenCharacter(updateUserRequestDto.IdentityNumber);
+            _rules.IdentityNumberMustBeDigit(updateUserRequestDto.IdentityNumber);
+            _rules.IdentityNumberMustBeUnique(updateUserRequestDto.IdentityNumber, updateUserRequestDto.Id);
+            _rules.UserCodeMustBeSixCharacter(updateUserRequestDto.UserCode);
+            _rules.UserCodeMustBeUnique(updateUserRequestDto.UserCode, updateUserRequestDto.Id);
+            User updateUser = UpdateUserRequestDto.ConvertToEntity(updateUserRequestDto);
+            User updatedUser = _userRepository.Update(updateUser);
+            ResultUserResponseDto response = ResultUserResponseDto.ConvertToResponsed(updatedUser);
+            return new Response<ResultUserResponseDto>()
+            {
+                Data = response,
+                Message = "User updated successfully!",
+                StatusCode = System.Net.HttpStatusCode.OK
+            };
+        }
+        catch (Exception e)
+        {
+            return new Response<ResultUserResponseDto>
+            {
+                Message = e.Message,
+                StatusCode = System.Net.HttpStatusCode.BadRequest
+            };
+        }
     }
 
     public async Task<Response<ResultUserResponseDto>> TUpdateAsync(UpdateUserRequestDto updateUserRequestDto)
     {
-        User updateUser = UpdateUserRequestDto.ConvertToEntity(updateUserRequestDto);
-        User updatedUser = await _userRepository.UpdateAsync(updateUser);
-        ResultUserResponseDto response = ResultUserResponseDto.ConvertToResponsed(updatedUser);
-        return new Response<ResultUserResponseDto>()
+        try
         {
-            Data = response,
-            Message = " User updated successfully!",
-            StatusCode = System.Net.HttpStatusCode.OK
-        };
+            _rules.StoreExists(updateUserRequestDto.StoreId);
+            _rules.IdentityNumberMustBeElevenCharacter(updateUserRequestDto.IdentityNumber);
+            _rules.IdentityNumberMustBeDigit(updateUserRequestDto.IdentityNumber);
+            _rules.IdentityNumberMustBeUnique(updateUserRequestDto.IdentityNumber, updateUserRequestDto.Id);
+            _rules.UserCodeMustBeSixCharacter(updateUserRequestDto.UserCode);
+            _rules.UserCodeMustBeUnique(updateUserRequestDto.UserCode, updateUserRequestDto.Id);
+            User updateUser = UpdateUserRequestDto.ConvertToEntity(updateUserRequestDto);
+            User updatedUser = await _userRepository.UpdateAsync(updateUser);
+            ResultUserResponseDto response = ResultUserResponseDto.ConvertToResponsed(updatedUser);
+            return new Response<ResultUserResponseDto>()
+            {
+                Data = response,
+                Message = "User updated successfully!",
+                StatusCode = System.Net.HttpStatusCode.OK
+            };
+        }
+        catch (Exception e)
+        {
+            return new Response<ResultUserResponseDto>
+            {
+                Message = e.Message,
+                StatusCode = System.Net.HttpStatusCode.BadRequest
+            };
+        }
     }
 }
