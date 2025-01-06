@@ -19,4 +19,5 @@ public class Product : EntityBase<int>
     public decimal? Weight { get; set; }
     public DateTime? Expiration { get; set; }
     public DateTime? Production { get; set; }
+    public ICollection<BasketItem> BasketItems { get; set; } = new List<BasketItem>();
 }

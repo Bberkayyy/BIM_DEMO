@@ -32,13 +32,13 @@ public class UserManager : IUserService
     {
         try
         {
-            _rules.StoreExists(createUserRequestDto.StoreId);
+            _rules.StoreExists(createUserRequestDto.StoreNo);
             _rules.IdentityNumberMustBeElevenCharacter(createUserRequestDto.IdentityNumber);
             _rules.IdentityNumberMustBeDigit(createUserRequestDto.IdentityNumber);
             _rules.IdentityNumberMustBeUnique(createUserRequestDto.IdentityNumber);
             int userCode = GenerateClass.GenerateRandomUniqueUserCode(_rules);
             int password = GenerateClass.GenerateRandomUserPassword();
-            User createUser = CreateUserRequestDto.ConvertToEntity(createUserRequestDto, userCode, password);
+            User createUser = CreateUserRequestDto.ConvertToEntity(createUserRequestDto, userCode, password, _rules.GetStoreId(createUserRequestDto.StoreNo));
             User createdUser = _userRepository.Create(createUser);
             ResultUserResponseDto response = ResultUserResponseDto.ConvertToResponsed(createdUser);
             return new Response<ResultUserResponseDto>()
@@ -63,13 +63,13 @@ public class UserManager : IUserService
     {
         try
         {
-            _rules.StoreExists(createUserRequestDto.StoreId);
+            _rules.StoreExists(createUserRequestDto.StoreNo);
             _rules.IdentityNumberMustBeElevenCharacter(createUserRequestDto.IdentityNumber);
             _rules.IdentityNumberMustBeDigit(createUserRequestDto.IdentityNumber);
             _rules.IdentityNumberMustBeUnique(createUserRequestDto.IdentityNumber);
             int userCode = GenerateClass.GenerateRandomUniqueUserCode(_rules);
             int password = GenerateClass.GenerateRandomUserPassword();
-            User createUser = CreateUserRequestDto.ConvertToEntity(createUserRequestDto, userCode, password);
+            User createUser = CreateUserRequestDto.ConvertToEntity(createUserRequestDto, userCode, password, _rules.GetStoreId(createUserRequestDto.StoreNo));
             User createdUser = await _userRepository.CreateAsync(createUser);
             ResultUserResponseDto response = ResultUserResponseDto.ConvertToResponsed(createdUser);
             return new Response<ResultUserResponseDto>()
@@ -411,13 +411,13 @@ public class UserManager : IUserService
     {
         try
         {
-            _rules.StoreExists(updateUserRequestDto.StoreId);
+            _rules.StoreExists(updateUserRequestDto.StoreNo);
             _rules.IdentityNumberMustBeElevenCharacter(updateUserRequestDto.IdentityNumber);
             _rules.IdentityNumberMustBeDigit(updateUserRequestDto.IdentityNumber);
             _rules.IdentityNumberMustBeUnique(updateUserRequestDto.IdentityNumber, updateUserRequestDto.Id);
             _rules.UserCodeMustBeSixCharacter(updateUserRequestDto.UserCode);
             _rules.UserCodeMustBeUnique(updateUserRequestDto.UserCode, updateUserRequestDto.Id);
-            User updateUser = UpdateUserRequestDto.ConvertToEntity(updateUserRequestDto);
+            User updateUser = UpdateUserRequestDto.ConvertToEntity(updateUserRequestDto, _rules.GetStoreId(updateUserRequestDto.StoreNo));
             User updatedUser = _userRepository.Update(updateUser);
             ResultUserResponseDto response = ResultUserResponseDto.ConvertToResponsed(updatedUser);
             return new Response<ResultUserResponseDto>()
@@ -441,13 +441,13 @@ public class UserManager : IUserService
     {
         try
         {
-            _rules.StoreExists(updateUserRequestDto.StoreId);
+            _rules.StoreExists(updateUserRequestDto.StoreNo);
             _rules.IdentityNumberMustBeElevenCharacter(updateUserRequestDto.IdentityNumber);
             _rules.IdentityNumberMustBeDigit(updateUserRequestDto.IdentityNumber);
             _rules.IdentityNumberMustBeUnique(updateUserRequestDto.IdentityNumber, updateUserRequestDto.Id);
             _rules.UserCodeMustBeSixCharacter(updateUserRequestDto.UserCode);
             _rules.UserCodeMustBeUnique(updateUserRequestDto.UserCode, updateUserRequestDto.Id);
-            User updateUser = UpdateUserRequestDto.ConvertToEntity(updateUserRequestDto);
+            User updateUser = UpdateUserRequestDto.ConvertToEntity(updateUserRequestDto, _rules.GetStoreId(updateUserRequestDto.StoreNo));
             User updatedUser = await _userRepository.UpdateAsync(updateUser);
             ResultUserResponseDto response = ResultUserResponseDto.ConvertToResponsed(updatedUser);
             return new Response<ResultUserResponseDto>()

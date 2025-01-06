@@ -22,6 +22,11 @@ public class UserRules : IUserRules
         _storeRepository = storeRepository;
     }
 
+    public int GetStoreId(string storeNo)
+    {
+        return _storeRepository.GetByFilter(x => x.StoreNo == storeNo)!.Id;
+    }
+
     public void IdentityNumberMustBeDigit(string identityNumber)
     {
         if (!identityNumber.All(char.IsDigit))
@@ -45,9 +50,9 @@ public class UserRules : IUserRules
         }
     }
 
-    public void StoreExists(int storeId)
+    public void StoreExists(string storeNo)
     {
-        Store? store = _storeRepository.GetByFilter(x => x.Id == storeId);
+        Store? store = _storeRepository.GetByFilter(x => x.StoreNo == storeNo);
         if (store == null)
             throw new BusinessException("Store not found!");
     }

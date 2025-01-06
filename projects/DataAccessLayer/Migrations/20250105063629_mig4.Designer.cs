@@ -4,6 +4,7 @@ using DataAccessLayer.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccessLayer.Migrations
 {
     [DbContext(typeof(BaseDbContext))]
-    partial class BaseDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250105063629_mig4")]
+    partial class mig4
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -261,7 +264,11 @@ namespace DataAccessLayer.Migrations
                     b.Property<int>("Password")
                         .HasColumnType("int");
 
-                    b.Property<int>("StoreId")
+                    b.Property<string>("StoreId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("StoreId1")
                         .HasColumnType("int");
 
                     b.Property<string>("Surname")
@@ -276,7 +283,7 @@ namespace DataAccessLayer.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("StoreId");
+                    b.HasIndex("StoreId1");
 
                     b.ToTable("Users");
                 });
@@ -329,8 +336,7 @@ namespace DataAccessLayer.Migrations
                 {
                     b.HasOne("EntityLayer.Entities.Basket", "Basket")
                         .WithMany("BasketItems")
-                        .HasForeignKey("BasketId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .HasForeignKey("BasketId");
 
                     b.HasOne("EntityLayer.Entities.Product", "Product")
                         .WithMany("BasketItems")
@@ -358,7 +364,7 @@ namespace DataAccessLayer.Migrations
                 {
                     b.HasOne("EntityLayer.Entities.Store", "Store")
                         .WithMany("Users")
-                        .HasForeignKey("StoreId")
+                        .HasForeignKey("StoreId1")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

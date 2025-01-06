@@ -9,7 +9,8 @@ namespace BusinessLogicLayer.BusinessRules.Abstract;
 
 public interface IUserRules
 {
-    void StoreExists(int storeId);
+    void StoreExists(string storeNo);
+    int GetStoreId(string storeNo);
     void IdentityNumberMustBeUnique(string identityNumber, int id = -1);
     void IdentityNumberMustBeElevenCharacter(string identityNumber);
     void IdentityNumberMustBeDigit(string identityNumber);

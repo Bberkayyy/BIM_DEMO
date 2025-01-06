@@ -1,4 +1,6 @@
 ﻿using DataAccessLayer.Context;
+using DataAccessLayer.Repositories.BasketItemRespositories;
+using DataAccessLayer.Repositories.BasketRepositories;
 using DataAccessLayer.Repositories.CategoryRepositories;
 using DataAccessLayer.Repositories.ProductRepositories;
 using DataAccessLayer.Repositories.RoleRepositories;
@@ -28,6 +30,8 @@ public static class DataAccessExtensions
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IRoleRepository, RoleRepository>();
         services.AddScoped<IUserRoleRepository, UserRoleRepository>();
+        services.AddScoped<IBasketRepository, BasketRepository>();
+        services.AddScoped<IBasketItemRepository, BasketItemRepository>();
         return services;
     }
 }

@@ -18,4 +18,5 @@ public class User : EntityBase<int>
     public int Password { get; set; }
 
     public ICollection<UserRole> UserRoles { get; set; } = new HashSet<UserRole>();
+    public ICollection<Basket> Baskets { get; set; } = new List<Basket>();
 }
