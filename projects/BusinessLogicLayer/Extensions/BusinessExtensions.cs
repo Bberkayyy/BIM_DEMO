@@ -25,6 +25,7 @@ public static class BusinessExtensions
         services.AddScoped<IUserRoleService, UserRoleManager>();
         services.AddScoped<IBasketService, BasketManager>();
         services.AddScoped<IBasketItemService, BasketItemManager>();
+        services.AddScoped<IPointOfSaleService, PointOfSaleManager>();
 
         services.AddScoped<ICategoryRules, CategoryRules>();
         services.AddScoped<IProductRules, ProductRules>();
@@ -34,6 +35,7 @@ public static class BusinessExtensions
         services.AddScoped<IUserRules, UserRules>();
         services.AddScoped<IBasketItemRules, BasketItemRules>();
         services.AddScoped<IBasketRules, BasketRules>();
+        services.AddScoped<IPointOfSaleRules, PointOfSaleRules>();
         return services;
     }
 }

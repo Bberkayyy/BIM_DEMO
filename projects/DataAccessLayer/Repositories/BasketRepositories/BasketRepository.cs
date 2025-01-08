@@ -35,6 +35,8 @@ public class BasketRepository : EfRepositoryBase<BaseDbContext, Basket, int>, IB
 
             await transaction.CommitAsync();
 
+            //yapılan ödeme türüne göre pos güncellenecek.
+
             return basket;
         }
         catch (Exception)

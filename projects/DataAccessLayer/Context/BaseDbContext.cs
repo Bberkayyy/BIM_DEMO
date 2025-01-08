@@ -31,6 +31,16 @@ public class BaseDbContext : DbContext
     .HasForeignKey(bi => bi.BasketId)
     .OnDelete(DeleteBehavior.Cascade);
 
+        modelBuilder.Entity<Till>().HasData(
+            new Till { Id = 1, Name = "Ödeme Noktası 1" },
+            new Till { Id = 2, Name = "Ödeme Noktası 2" }
+        );
+
+        modelBuilder.Entity<PointOfSale>()
+     .HasOne(p => p.User)
+     .WithMany(u => u.PointOfSales)
+     .HasForeignKey(p => p.UserCode)
+     .HasPrincipalKey(u => u.UserCode);
     }
 
     public DbSet<Category>? Categories { get; set; }
@@ -41,4 +51,6 @@ public class BaseDbContext : DbContext
     public DbSet<UserRole>? UserRoles { get; set; }
     public DbSet<Basket>? Baskets { get; set; }
     public DbSet<BasketItem>? BasketItems { get; set; }
+    public DbSet<PointOfSale>? PointOfSales { get; set; }
+    public DbSet<Till>? Tills { get; set; }
 }

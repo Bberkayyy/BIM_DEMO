@@ -2,9 +2,11 @@
 using DataAccessLayer.Repositories.BasketItemRespositories;
 using DataAccessLayer.Repositories.BasketRepositories;
 using DataAccessLayer.Repositories.CategoryRepositories;
+using DataAccessLayer.Repositories.PointOfSaleRepositories;
 using DataAccessLayer.Repositories.ProductRepositories;
 using DataAccessLayer.Repositories.RoleRepositories;
 using DataAccessLayer.Repositories.StoreRepositories;
+using DataAccessLayer.Repositories.TillRepositories;
 using DataAccessLayer.Repositories.UserRepositories;
 using DataAccessLayer.Repositories.UserRoleRepositories;
 using Microsoft.EntityFrameworkCore;
@@ -32,6 +34,8 @@ public static class DataAccessExtensions
         services.AddScoped<IUserRoleRepository, UserRoleRepository>();
         services.AddScoped<IBasketRepository, BasketRepository>();
         services.AddScoped<IBasketItemRepository, BasketItemRepository>();
+        services.AddScoped<ITillRepository, TillRepository>();
+        services.AddScoped<IPointOfSaleRepository, PointOfSaleRepository>();
         return services;
     }
 }
