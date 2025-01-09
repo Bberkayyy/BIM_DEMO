@@ -2,6 +2,8 @@
 using DataAccessLayer.Context;
 using EntityLayer.Dtos.RequestDtos.BasketItemsRequestDtos;
 using EntityLayer.Entities;
+using EntityLayer.Enums;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using System;
 using System.Collections.Generic;
@@ -33,9 +35,41 @@ public class BasketRepository : EfRepositoryBase<BaseDbContext, Basket, int>, IB
             Context.Set<BasketItem>().UpdateRange(basket.BasketItems);
             await Context.SaveChangesAsync();
 
-            await transaction.CommitAsync();
+            foreach (var payment in basket.BasketPayments)
+            {
+                payment.BasketId = basket.Id;
+            }
+            await Context.Set<BasketPayment>().AddRangeAsync(basket.BasketPayments);
+            await Context.SaveChangesAsync();
 
-            //yapılan ödeme türüne göre pos güncellenecek.
+            PointOfSale? pointOfSale = await Context.Set<PointOfSale>()
+            .FirstOrDefaultAsync(p => p.UserCode == basket.UserCode);
+
+            if (pointOfSale != null)
+            {
+                foreach (var payment in basket.BasketPayments)
+                {
+                    switch (payment.PaymentType)
+                    {
+                        case PaymentType.Cash:
+                            pointOfSale.CashPaymentTotal += payment.Amount;
+                            break;
+                        case PaymentType.CreditCart:
+                            pointOfSale.CreditCardPaymentTotal += payment.Amount;
+                            break;
+                        case PaymentType.GiftCard:
+                            pointOfSale.GiftCardPaymentTotal += payment.Amount;
+                            break;
+                        case PaymentType.Other:
+                            pointOfSale.OtherPaymentTotal += payment.Amount;
+                            break;
+                    }
+                }
+                Context.Set<PointOfSale>().Update(pointOfSale);
+                await Context.SaveChangesAsync();
+            }
+
+            await transaction.CommitAsync();
 
             return basket;
         }

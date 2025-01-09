@@ -2,11 +2,14 @@
 using BusinessLogicLayer.BusinessRules.Abstract;
 using Core.Shared;
 using DataAccessLayer.Repositories.BasketItemRespositories;
+using DataAccessLayer.Repositories.BasketPaymentRepositories;
 using DataAccessLayer.Repositories.BasketRepositories;
 using DataAccessLayer.Repositories.ProductRepositories;
 using EntityLayer.Dtos.RequestDtos.BasketItemsRequestDtos;
+using EntityLayer.Dtos.RequestDtos.BasketPaymentRequestDtos;
 using EntityLayer.Dtos.RequestDtos.BasketRequestDtos;
 using EntityLayer.Dtos.ResponseDtos.BasketItemResponseDtos;
+using EntityLayer.Dtos.ResponseDtos.BasketPaymentResponseDtos;
 using EntityLayer.Dtos.ResponseDtos.BasketResponseDtos;
 using EntityLayer.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -24,13 +27,15 @@ public class BasketManager : IBasketService
 {
     private readonly IBasketRepository _basketRepository;
     private readonly IBasketItemRepository _basketItemRepository;
+    private readonly IBasketPaymentRepository _basketPaymentRepository;
     private readonly IBasketRules _rules;
 
-    public BasketManager(IBasketRepository basketRepository, IBasketItemRepository basketItemRepository, IBasketRules rules)
+    public BasketManager(IBasketRepository basketRepository, IBasketItemRepository basketItemRepository, IBasketRules rules, IBasketPaymentRepository basketPaymentRepository)
     {
         _basketRepository = basketRepository;
         _basketItemRepository = basketItemRepository;
         _rules = rules;
+        _basketPaymentRepository = basketPaymentRepository;
     }
 
     public Response<ResultBasketResponseDto> TDeleteFromDatabase(int id)
@@ -102,13 +107,14 @@ public class BasketManager : IBasketService
     }
 
     public async Task<Response<ResultBasketResponseDto>> TSaveBasketAsync(CreateBasketRequestDto createBasketRequestDto)
-    {
+    {       
         try
         {
             _rules.UserExists(createBasketRequestDto.userCode);
             List<BasketItem> basketItems = _basketItemRepository.GetAll(x => x.Deleted == null, x => x.Include(x => x.Product));
             _rules.BasketItemsExists(basketItems);
-            Basket saveBasket = CreateBasketRequestDto.ConvertToEntity(createBasketRequestDto, basketItems);
+            List<BasketPayment> basketPayment = CreateBasketPaymentRequestDto.ConvertToEntity(new CreateBasketPaymentRequestDto(createBasketRequestDto.userCode, createBasketRequestDto.paymentDetails));
+            Basket saveBasket = CreateBasketRequestDto.ConvertToEntity(createBasketRequestDto, basketItems,basketPayment);
             Basket savedBasket = await _basketRepository.SaveBasketAsync(saveBasket);
             ResultBasketResponseDto response = ResultBasketResponseDto.ConvertToResponse(savedBasket);
             return new Response<ResultBasketResponseDto>

@@ -1,4 +1,5 @@
 ﻿using Core.Persistence.DtoBaseModel;
+using EntityLayer.Dtos.RequestDtos.BasketPaymentRequestDtos;
 using EntityLayer.Entities;
 using System;
 using System.Collections.Generic;
@@ -8,15 +9,16 @@ using System.Threading.Tasks;
 
 namespace EntityLayer.Dtos.RequestDtos.BasketRequestDtos;
 
-public record CreateBasketRequestDto(int userCode) : IRequestDto
+public record CreateBasketRequestDto(int userCode, List<PaymentDetailDto> paymentDetails) : IRequestDto
 {
-    public static Basket ConvertToEntity(CreateBasketRequestDto createBasketRequestDto, List<BasketItem> basketItems)
+    public static Basket ConvertToEntity(CreateBasketRequestDto createBasketRequestDto, List<BasketItem> basketItems, List<BasketPayment> basketPayments)
     {
         return new Basket()
         {
             UserCode = createBasketRequestDto.userCode,
             BasketItems = basketItems,
-            Created = DateTime.Now
+            BasketPayments = basketPayments,
+            Created = DateTime.Now,
         };
     }
 }

@@ -12,4 +12,5 @@ public class Basket : EntityBase<int>
     public int UserCode { get; set; }
     public User User { get; set; } = null!;
     public List<BasketItem> BasketItems { get; set; } = new List<BasketItem>();
+    public List<BasketPayment> BasketPayments { get; set; } = new List<BasketPayment>();
 }
