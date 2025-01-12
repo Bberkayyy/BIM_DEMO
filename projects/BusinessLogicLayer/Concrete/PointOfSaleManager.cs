@@ -1,5 +1,6 @@
 ﻿using BusinessLogicLayer.Abstract;
 using BusinessLogicLayer.BusinessRules.Abstract;
+using Core.CrossCuttingConcerns;
 using Core.Shared;
 using DataAccessLayer.Repositories.PointOfSaleRepositories;
 using EntityLayer.Dtos.RequestDtos.PointOfSaleRequestDtos;
@@ -25,6 +26,156 @@ public class PointOfSaleManager : IPointOfSaleService
     {
         _pointOfSaleRepository = pointOfSaleRepository;
         _rules = rules;
+    }
+
+    public Response<ResultPointOfSaleResponseDto> TAdvanceWithdrawal(int userCode, int tillId, decimal advanceAmount)
+    {
+        try
+        {
+            PointOfSale? pos = _pointOfSaleRepository.GetByFilter(x => x.UserCode == userCode && x.TillId == tillId && x.Deleted == null);
+            _rules.PointOfSaleExists(pos!);
+            pos!.AdvanceWithdrawalTotal += advanceAmount;
+            _pointOfSaleRepository.Update(pos);
+            return new Response<ResultPointOfSaleResponseDto>
+            {
+                Message = "Advance withdrawal is successfully processed!",
+                StatusCode = System.Net.HttpStatusCode.OK
+            };
+        }
+        catch (Exception e)
+        {
+            return new Response<ResultPointOfSaleResponseDto>
+            {
+                Message = e.Message,
+                StatusCode = System.Net.HttpStatusCode.NotFound
+            };
+        }
+    }
+
+    public async Task<Response<ResultPointOfSaleResponseDto>> TAdvanceWithdrawalAsync(int userCode, int tillId, decimal advanceAmount)
+    {
+        try
+        {
+            PointOfSale? pos = await _pointOfSaleRepository.GetByFilterAsync(x => x.UserCode == userCode && x.TillId == tillId && x.Deleted == null);
+            _rules.PointOfSaleExists(pos!);
+            pos!.AdvanceWithdrawalTotal += advanceAmount;
+            _pointOfSaleRepository.Update(pos);
+            return new Response<ResultPointOfSaleResponseDto>
+            {
+                Message = "Advance withdrawal is successfully processed!",
+                StatusCode = System.Net.HttpStatusCode.OK
+            };
+        }
+        catch (Exception e)
+        {
+            return new Response<ResultPointOfSaleResponseDto>
+            {
+                Message = e.Message,
+                StatusCode = System.Net.HttpStatusCode.NotFound
+            };
+        }
+    }
+
+    public Response<ResultPointOfSaleResponseDto> TCashWithdrawal(int userCode, int tillId, decimal cashAmount)
+    {
+        try
+        {
+            PointOfSale? pos = _pointOfSaleRepository.GetByFilter(x => x.UserCode == userCode && x.TillId == tillId && x.Deleted == null);
+            _rules.PointOfSaleExists(pos!);
+            pos!.CashWithdrawalTotal += cashAmount;
+            _pointOfSaleRepository.Update(pos);
+            return new Response<ResultPointOfSaleResponseDto>
+            {
+                Message = "Cash withdrawal is successfully processed!",
+                StatusCode = System.Net.HttpStatusCode.OK
+            };
+        }
+        catch (Exception e)
+        {
+            return new Response<ResultPointOfSaleResponseDto>
+            {
+                Message = e.Message,
+                StatusCode = System.Net.HttpStatusCode.NotFound
+            };
+        }
+    }
+
+    public async Task<Response<ResultPointOfSaleResponseDto>> TCashWithdrawalAsync(int userCode, int tillId, decimal cashAmount)
+    {
+        try
+        {
+            PointOfSale? pos = await _pointOfSaleRepository.GetByFilterAsync(x => x.UserCode == userCode && x.TillId == tillId && x.Deleted == null);
+            _rules.PointOfSaleExists(pos!);
+            pos!.CashWithdrawalTotal += cashAmount;
+            _pointOfSaleRepository.Update(pos);
+            return new Response<ResultPointOfSaleResponseDto>
+            {
+                Message = "Cash withdrawal is successfully processed!",
+                StatusCode = System.Net.HttpStatusCode.OK
+            };
+        }
+        catch (Exception e)
+        {
+            return new Response<ResultPointOfSaleResponseDto>
+            {
+                Message = e.Message,
+                StatusCode = System.Net.HttpStatusCode.NotFound
+            };
+        }
+    }
+
+    public Response<ResultPointOfSaleResponseDto> TGiveBack(int userCode, int tillId, decimal giveBackAmount, bool isReturnInCash)
+    {
+        try
+        {
+            PointOfSale? pos = _pointOfSaleRepository.GetByFilter(x => x.UserCode == userCode && x.TillId == tillId && x.Deleted == null);
+            _rules.PointOfSaleExists(pos!);
+            if (isReturnInCash)
+                pos!.GiveBackTotal += giveBackAmount;
+            else
+                pos!.CreditCardPaymentTotal -= giveBackAmount;
+            _pointOfSaleRepository.Update(pos);
+            return new Response<ResultPointOfSaleResponseDto>
+            {
+                Message = "Give back is successfully processed!",
+                StatusCode = System.Net.HttpStatusCode.OK
+            };
+        }
+        catch (Exception e)
+        {
+            return new Response<ResultPointOfSaleResponseDto>
+            {
+                Message = e.Message,
+                StatusCode = System.Net.HttpStatusCode.NotFound
+            };
+        }
+    }
+
+    public async Task<Response<ResultPointOfSaleResponseDto>> TGiveBackAsync(int userCode, int tillId, decimal giveBackAmount, bool isReturnInCash)
+    {
+        try
+        {
+            PointOfSale? pos = await _pointOfSaleRepository.GetByFilterAsync(x => x.UserCode == userCode && x.TillId == tillId && x.Deleted == null);
+            _rules.PointOfSaleExists(pos!);
+            if (isReturnInCash)
+                pos!.GiveBackTotal += giveBackAmount;
+            else
+                pos!.CreditCardPaymentTotal -= giveBackAmount;
+            await _pointOfSaleRepository.UpdateAsync(pos);
+            return new Response<ResultPointOfSaleResponseDto>
+            {
+                Message = "Cash withdrawal is successfully processed!",
+                StatusCode = System.Net.HttpStatusCode.OK
+            };
+        }
+        catch (Exception e)
+        {
+            return new Response<ResultPointOfSaleResponseDto>
+            {
+                Message = e.Message,
+                StatusCode = System.Net.HttpStatusCode.NotFound
+            };
+        }
     }
 
     public Response<ResultPointOfSaleResponseDto> TCashierCheckIn(CreatePointOfSaleRequestDto createPointOfSaleRequestDto)
@@ -200,5 +351,56 @@ public class PointOfSaleManager : IPointOfSaleService
             };
         }
 
+    }
+
+    public Response<ResultPointOfSaleResponseDto> TCashierExitReport(int userCode, int tillId)
+    {
+        try
+        {
+            PointOfSale? pos = _pointOfSaleRepository.GetByFilter(x => x.UserCode == userCode && x.TillId == tillId && x.Deleted == null);
+            _rules.PointOfSaleExists(pos!);
+            pos!.SaleTotal = pos.CashPaymentTotal + pos.CreditCardPaymentTotal + pos.OtherPaymentTotal + pos.GiftCardPaymentTotal;
+            pos.DrawerTotal = pos.CashPaymentTotal - pos.CashWithdrawalTotal + pos.OtherPaymentTotal;
+            PointOfSale? exitPos = _pointOfSaleRepository.Update(pos);
+            ResultPointOfSaleResponseDto response = ResultPointOfSaleResponseDto.ConvertToResponse(exitPos);
+            return new Response<ResultPointOfSaleResponseDto>
+            {
+                Data = response,
+                StatusCode = System.Net.HttpStatusCode.OK
+            };
+        }
+        catch (Exception e)
+        {
+            return new Response<ResultPointOfSaleResponseDto>
+            {
+                Message = e.Message,
+                StatusCode = System.Net.HttpStatusCode.NotFound
+            };
+        }
+    }
+    public async Task<Response<ResultPointOfSaleResponseDto>> TCashierExitReportAsync(int userCode, int tillId)
+    {
+        try
+        {
+            PointOfSale? pos = _pointOfSaleRepository.GetByFilter(x => x.UserCode == userCode && x.TillId == tillId && x.Deleted == null);
+            _rules.PointOfSaleExists(pos!);
+            pos!.SaleTotal = pos.CashPaymentTotal + pos.CreditCardPaymentTotal + pos.OtherPaymentTotal + pos.GiftCardPaymentTotal;
+            pos.DrawerTotal = pos.CashPaymentTotal - pos.CashWithdrawalTotal + pos.OtherPaymentTotal;
+            PointOfSale? exitPos = await _pointOfSaleRepository.UpdateAsync(pos);
+            ResultPointOfSaleResponseDto response = ResultPointOfSaleResponseDto.ConvertToResponse(exitPos);
+            return new Response<ResultPointOfSaleResponseDto>
+            {
+                Data = response,
+                StatusCode = System.Net.HttpStatusCode.OK
+            };
+        }
+        catch (Exception e)
+        {
+            return new Response<ResultPointOfSaleResponseDto>
+            {
+                Message = e.Message,
+                StatusCode = System.Net.HttpStatusCode.NotFound
+            };
+        }
     }
 }

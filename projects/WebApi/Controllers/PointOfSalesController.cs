@@ -40,4 +40,40 @@ public class PointOfSalesController : BaseController
         Response<ResultPointOfSaleResponseDto> result = await _pointOfSaleService.TCashierCheckOutByUserCodeAsync(userCode);
         return ActionResultInstance(result);
     }
+    [HttpPost]
+    public IActionResult AdvanceWithdrawal(int userCode, int tillId, decimal advanceAmount)
+    {
+        Response<ResultPointOfSaleResponseDto> result = _pointOfSaleService.TAdvanceWithdrawal(userCode, tillId, advanceAmount);
+        return ActionResultInstance(result);
+    }
+    [HttpPost]
+    public async Task<IActionResult> AsyncAdvanceWithdrawal(int userCode, int tillId, decimal advanceAmount)
+    {
+        Response<ResultPointOfSaleResponseDto> result = await _pointOfSaleService.TAdvanceWithdrawalAsync(userCode, tillId, advanceAmount);
+        return ActionResultInstance(result);
+    }
+    [HttpPost]
+    public IActionResult CashWithdrawal(int userCode, int tillId, decimal cashAmount)
+    {
+        Response<ResultPointOfSaleResponseDto> result = _pointOfSaleService.TCashWithdrawal(userCode, tillId, cashAmount);
+        return ActionResultInstance(result);
+    }
+    [HttpPost]
+    public async Task<IActionResult> AsyncCashWithdrawal(int userCode, int tillId, decimal cashAmount)
+    {
+        Response<ResultPointOfSaleResponseDto> result = await _pointOfSaleService.TCashWithdrawalAsync(userCode, tillId, cashAmount);
+        return ActionResultInstance(result);
+    }
+    [HttpPost]
+    public IActionResult GiveBack(int userCode, int tillId, decimal giveBackAmount)
+    {
+        Response<ResultPointOfSaleResponseDto> result = _pointOfSaleService.TGiveBack(userCode, tillId, giveBackAmount);
+        return ActionResultInstance(result);
+    }
+    [HttpPost]
+    public async Task<IActionResult> AsyncGiveBack(int userCode, int tillId, decimal giveBackAmount)
+    {
+        Response<ResultPointOfSaleResponseDto> result = await _pointOfSaleService.TGiveBackAsync(userCode, tillId, giveBackAmount);
+        return ActionResultInstance(result);
+    }
 }
