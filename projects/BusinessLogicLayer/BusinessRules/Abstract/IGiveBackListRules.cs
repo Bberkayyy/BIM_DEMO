@@ -7,10 +7,9 @@ using System.Threading.Tasks;
 
 namespace BusinessLogicLayer.BusinessRules.Abstract;
 
-public interface IPointOfSaleRules
+public interface IGiveBackListRules
 {
-    void TillExists(int tillId);
-    void UserExists(int userCode);
-    void PointOfSaleExists(PointOfSale? pointOfSale);
-    void ProductExists(Product? product);
+    void ProductExists(long barcodeNo);
+    void CustomerExists(string identityNumber);
+    void GiveBackExists(GiveBackList? giveBack);
 }

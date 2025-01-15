@@ -1,8 +1,13 @@
 ﻿using BusinessLogicLayer.Abstract;
 using BusinessLogicLayer.BusinessRules.Abstract;
+using BusinessLogicLayer.Extensions.Dtos.PosDtos;
 using Core.CrossCuttingConcerns;
 using Core.Shared;
+using DataAccessLayer.Repositories.CustomerRepositories;
 using DataAccessLayer.Repositories.PointOfSaleRepositories;
+using DataAccessLayer.Repositories.ProductRepositories;
+using EntityLayer.Dtos.RequestDtos.CustomerRequestDtos;
+using EntityLayer.Dtos.RequestDtos.GiveBackListRequestDtos;
 using EntityLayer.Dtos.RequestDtos.PointOfSaleRequestDtos;
 using EntityLayer.Dtos.ResponseDtos.PointOfSaleResponseDtos;
 using EntityLayer.Entities;
@@ -21,20 +26,26 @@ public class PointOfSaleManager : IPointOfSaleService
 {
     private readonly IPointOfSaleRepository _pointOfSaleRepository;
     private readonly IPointOfSaleRules _rules;
+    private readonly IProductRepository _productRepository;
+    private readonly ICustomerRepository _customerRepository;
+    private readonly IGiveBackListService _giveBackListService;
 
-    public PointOfSaleManager(IPointOfSaleRepository pointOfSaleRepository, IPointOfSaleRules rules)
+    public PointOfSaleManager(IPointOfSaleRepository pointOfSaleRepository, IPointOfSaleRules rules, IProductRepository productRepository, ICustomerRepository customerRepository, IGiveBackListService giveBackListService)
     {
         _pointOfSaleRepository = pointOfSaleRepository;
         _rules = rules;
+        _productRepository = productRepository;
+        _customerRepository = customerRepository;
+        _giveBackListService = giveBackListService;
     }
 
-    public Response<ResultPointOfSaleResponseDto> TAdvanceWithdrawal(int userCode, int tillId, decimal advanceAmount)
+    public Response<ResultPointOfSaleResponseDto> TAdvanceWithdrawal(AdvanceWithdrawalDto advanceWithdrawalDto)
     {
         try
         {
-            PointOfSale? pos = _pointOfSaleRepository.GetByFilter(x => x.UserCode == userCode && x.TillId == tillId && x.Deleted == null);
+            PointOfSale? pos = _pointOfSaleRepository.GetByFilter(x => x.UserCode == advanceWithdrawalDto.userCode && x.TillId == advanceWithdrawalDto.tillId && x.Deleted == null);
             _rules.PointOfSaleExists(pos!);
-            pos!.AdvanceWithdrawalTotal += advanceAmount;
+            pos!.AdvanceWithdrawalTotal += advanceWithdrawalDto.advanceAmount;
             _pointOfSaleRepository.Update(pos);
             return new Response<ResultPointOfSaleResponseDto>
             {
@@ -52,13 +63,13 @@ public class PointOfSaleManager : IPointOfSaleService
         }
     }
 
-    public async Task<Response<ResultPointOfSaleResponseDto>> TAdvanceWithdrawalAsync(int userCode, int tillId, decimal advanceAmount)
+    public async Task<Response<ResultPointOfSaleResponseDto>> TAdvanceWithdrawalAsync(AdvanceWithdrawalDto advanceWithdrawalDto)
     {
         try
         {
-            PointOfSale? pos = await _pointOfSaleRepository.GetByFilterAsync(x => x.UserCode == userCode && x.TillId == tillId && x.Deleted == null);
+            PointOfSale? pos = await _pointOfSaleRepository.GetByFilterAsync(x => x.UserCode == advanceWithdrawalDto.userCode && x.TillId == advanceWithdrawalDto.tillId && x.Deleted == null);
             _rules.PointOfSaleExists(pos!);
-            pos!.AdvanceWithdrawalTotal += advanceAmount;
+            pos!.AdvanceWithdrawalTotal += advanceWithdrawalDto.advanceAmount;
             _pointOfSaleRepository.Update(pos);
             return new Response<ResultPointOfSaleResponseDto>
             {
@@ -76,13 +87,13 @@ public class PointOfSaleManager : IPointOfSaleService
         }
     }
 
-    public Response<ResultPointOfSaleResponseDto> TCashWithdrawal(int userCode, int tillId, decimal cashAmount)
+    public Response<ResultPointOfSaleResponseDto> TCashWithdrawal(CashWithdrawalDto cashWithdrawalDto)
     {
         try
         {
-            PointOfSale? pos = _pointOfSaleRepository.GetByFilter(x => x.UserCode == userCode && x.TillId == tillId && x.Deleted == null);
+            PointOfSale? pos = _pointOfSaleRepository.GetByFilter(x => x.UserCode == cashWithdrawalDto.userCode && x.TillId == cashWithdrawalDto.tillId && x.Deleted == null);
             _rules.PointOfSaleExists(pos!);
-            pos!.CashWithdrawalTotal += cashAmount;
+            pos!.CashWithdrawalTotal += cashWithdrawalDto.cashAmount;
             _pointOfSaleRepository.Update(pos);
             return new Response<ResultPointOfSaleResponseDto>
             {
@@ -100,13 +111,13 @@ public class PointOfSaleManager : IPointOfSaleService
         }
     }
 
-    public async Task<Response<ResultPointOfSaleResponseDto>> TCashWithdrawalAsync(int userCode, int tillId, decimal cashAmount)
+    public async Task<Response<ResultPointOfSaleResponseDto>> TCashWithdrawalAsync(CashWithdrawalDto cashWithdrawalDto)
     {
         try
         {
-            PointOfSale? pos = await _pointOfSaleRepository.GetByFilterAsync(x => x.UserCode == userCode && x.TillId == tillId && x.Deleted == null);
+            PointOfSale? pos = await _pointOfSaleRepository.GetByFilterAsync(x => x.UserCode == cashWithdrawalDto.userCode && x.TillId == cashWithdrawalDto.tillId && x.Deleted == null);
             _rules.PointOfSaleExists(pos!);
-            pos!.CashWithdrawalTotal += cashAmount;
+            pos!.CashWithdrawalTotal += cashWithdrawalDto.cashAmount;
             _pointOfSaleRepository.Update(pos);
             return new Response<ResultPointOfSaleResponseDto>
             {
@@ -124,17 +135,31 @@ public class PointOfSaleManager : IPointOfSaleService
         }
     }
 
-    public Response<ResultPointOfSaleResponseDto> TGiveBack(int userCode, int tillId, decimal giveBackAmount, bool isReturnInCash)
+    public Response<ResultPointOfSaleResponseDto> TGiveBack(GiveBackDto giveBackDto)
     {
         try
         {
-            PointOfSale? pos = _pointOfSaleRepository.GetByFilter(x => x.UserCode == userCode && x.TillId == tillId && x.Deleted == null);
-            _rules.PointOfSaleExists(pos!);
-            if (isReturnInCash)
-                pos!.GiveBackTotal += giveBackAmount;
+            PointOfSale? pos = _pointOfSaleRepository.GetByFilter(x => x.UserCode == giveBackDto.userCode && x.TillId == giveBackDto.tillId && x.Deleted == null);
+            _rules.PointOfSaleExists(pos);
+            Product? product = _productRepository.GetByFilter(x => x.BarcodeNo == giveBackDto.productBarcodeNo);
+            _rules.ProductExists(product);
+            if (product!.Weight != 0)
+                product.Weight += giveBackDto.productQuantity;
             else
-                pos!.CreditCardPaymentTotal -= giveBackAmount;
+                product.Stock += (int)giveBackDto.productQuantity;
+            _productRepository.Update(product);
+            if (giveBackDto.isReturnCash)
+                pos!.GiveBackTotal += giveBackDto.giveBackAmount;
+            else
+                pos!.CreditCardPaymentTotal -= giveBackDto.giveBackAmount;
             _pointOfSaleRepository.Update(pos);
+            Customer? customer = _customerRepository.GetByFilter(x => x.IdentityNumber == giveBackDto.createCustomerRequestDto.IdentityNumber);
+            if (customer != null)
+                _customerRepository.Update(customer);
+            else
+                _customerRepository.Create(CreateCustomerRequestDto.ConvertToEntity(giveBackDto.createCustomerRequestDto));
+            CreateGiveBackListRequestDto complated = new CreateGiveBackListRequestDto(customer!.IdentityNumber, product.BarcodeNo, giveBackDto.ReasonForReturn, giveBackDto.isReturnCash, giveBackDto.productQuantity, giveBackDto.giveBackAmount);
+            _giveBackListService.TCreate(complated);
             return new Response<ResultPointOfSaleResponseDto>
             {
                 Message = "Give back is successfully processed!",
@@ -151,20 +176,34 @@ public class PointOfSaleManager : IPointOfSaleService
         }
     }
 
-    public async Task<Response<ResultPointOfSaleResponseDto>> TGiveBackAsync(int userCode, int tillId, decimal giveBackAmount, bool isReturnInCash)
+    public async Task<Response<ResultPointOfSaleResponseDto>> TGiveBackAsync(GiveBackDto giveBackDto)
     {
         try
         {
-            PointOfSale? pos = await _pointOfSaleRepository.GetByFilterAsync(x => x.UserCode == userCode && x.TillId == tillId && x.Deleted == null);
-            _rules.PointOfSaleExists(pos!);
-            if (isReturnInCash)
-                pos!.GiveBackTotal += giveBackAmount;
+            PointOfSale? pos = await _pointOfSaleRepository.GetByFilterAsync(x => x.UserCode == giveBackDto.userCode && x.TillId == giveBackDto.tillId && x.Deleted == null);
+            _rules.PointOfSaleExists(pos);
+            Product? product = await _productRepository.GetByFilterAsync(x => x.BarcodeNo == giveBackDto.productBarcodeNo);
+            _rules.ProductExists(product);
+            if (product!.Weight != 0)
+                product.Weight += giveBackDto.productQuantity;
             else
-                pos!.CreditCardPaymentTotal -= giveBackAmount;
-            await _pointOfSaleRepository.UpdateAsync(pos);
+                product.Stock += (int)giveBackDto.productQuantity;
+            _productRepository.Update(product);
+            if (giveBackDto.isReturnCash)
+                pos!.GiveBackTotal += giveBackDto.giveBackAmount;
+            else
+                pos!.CreditCardPaymentTotal -= giveBackDto.giveBackAmount;
+            _pointOfSaleRepository.Update(pos);
+            Customer? customer = _customerRepository.GetByFilter(x => x.IdentityNumber == giveBackDto.createCustomerRequestDto.IdentityNumber);
+            if (customer != null)
+                _customerRepository.Update(customer);
+            else
+                _customerRepository.Create(CreateCustomerRequestDto.ConvertToEntity(giveBackDto.createCustomerRequestDto));
+            CreateGiveBackListRequestDto complated = new CreateGiveBackListRequestDto(customer!.IdentityNumber, product.BarcodeNo, giveBackDto.ReasonForReturn, giveBackDto.isReturnCash, giveBackDto.productQuantity, giveBackDto.giveBackAmount);
+            _giveBackListService.TCreate(complated);
             return new Response<ResultPointOfSaleResponseDto>
             {
-                Message = "Cash withdrawal is successfully processed!",
+                Message = "Give back is successfully processed!",
                 StatusCode = System.Net.HttpStatusCode.OK
             };
         }

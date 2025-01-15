@@ -1,9 +1,11 @@
 ﻿using BusinessLogicLayer.Abstract;
+using BusinessLogicLayer.Extensions.Dtos.PosDtos;
 using Core.Shared;
 using EntityLayer.Dtos.RequestDtos.PointOfSaleRequestDtos;
 using EntityLayer.Dtos.ResponseDtos.PointOfSaleResponseDtos;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace WebApi.Controllers;
 
@@ -41,39 +43,51 @@ public class PointOfSalesController : BaseController
         return ActionResultInstance(result);
     }
     [HttpPost]
-    public IActionResult AdvanceWithdrawal(int userCode, int tillId, decimal advanceAmount)
+    public IActionResult AdvanceWithdrawal(AdvanceWithdrawalDto advanceWithdrawalDto)
     {
-        Response<ResultPointOfSaleResponseDto> result = _pointOfSaleService.TAdvanceWithdrawal(userCode, tillId, advanceAmount);
+        Response<ResultPointOfSaleResponseDto> result = _pointOfSaleService.TAdvanceWithdrawal(advanceWithdrawalDto);
         return ActionResultInstance(result);
     }
     [HttpPost]
-    public async Task<IActionResult> AsyncAdvanceWithdrawal(int userCode, int tillId, decimal advanceAmount)
+    public async Task<IActionResult> AsyncAdvanceWithdrawal(AdvanceWithdrawalDto advanceWithdrawalDto)
     {
-        Response<ResultPointOfSaleResponseDto> result = await _pointOfSaleService.TAdvanceWithdrawalAsync(userCode, tillId, advanceAmount);
+        Response<ResultPointOfSaleResponseDto> result = await _pointOfSaleService.TAdvanceWithdrawalAsync(advanceWithdrawalDto);
         return ActionResultInstance(result);
     }
     [HttpPost]
-    public IActionResult CashWithdrawal(int userCode, int tillId, decimal cashAmount)
+    public IActionResult CashWithdrawal(CashWithdrawalDto cashWithdrawalDto)
     {
-        Response<ResultPointOfSaleResponseDto> result = _pointOfSaleService.TCashWithdrawal(userCode, tillId, cashAmount);
+        Response<ResultPointOfSaleResponseDto> result = _pointOfSaleService.TCashWithdrawal(cashWithdrawalDto);
         return ActionResultInstance(result);
     }
     [HttpPost]
-    public async Task<IActionResult> AsyncCashWithdrawal(int userCode, int tillId, decimal cashAmount)
+    public async Task<IActionResult> AsyncCashWithdrawal(CashWithdrawalDto cashWithdrawalDto)
     {
-        Response<ResultPointOfSaleResponseDto> result = await _pointOfSaleService.TCashWithdrawalAsync(userCode, tillId, cashAmount);
+        Response<ResultPointOfSaleResponseDto> result = await _pointOfSaleService.TCashWithdrawalAsync(cashWithdrawalDto);
         return ActionResultInstance(result);
     }
     [HttpPost]
-    public IActionResult GiveBack(int userCode, int tillId, decimal giveBackAmount)
+    public IActionResult GiveBack(GiveBackDto giveBackDto)
     {
-        Response<ResultPointOfSaleResponseDto> result = _pointOfSaleService.TGiveBack(userCode, tillId, giveBackAmount);
+        Response<ResultPointOfSaleResponseDto> result = _pointOfSaleService.TGiveBack(giveBackDto);
         return ActionResultInstance(result);
     }
     [HttpPost]
-    public async Task<IActionResult> AsyncGiveBack(int userCode, int tillId, decimal giveBackAmount)
+    public async Task<IActionResult> AsyncGiveBack(GiveBackDto giveBackDto)
     {
-        Response<ResultPointOfSaleResponseDto> result = await _pointOfSaleService.TGiveBackAsync(userCode, tillId, giveBackAmount);
+        Response<ResultPointOfSaleResponseDto> result = await _pointOfSaleService.TGiveBackAsync(giveBackDto);
+        return ActionResultInstance(result);
+    }
+    [HttpPost]
+    public IActionResult CashierExitReport(int userCode, int tillId)
+    {
+        Response<ResultPointOfSaleResponseDto> result = _pointOfSaleService.TCashierExitReport(userCode, tillId);
+        return ActionResultInstance(result);
+    }
+    [HttpPost]
+    public async Task<IActionResult> AsyncCashierExitReport(int userCode, int tillId)
+    {
+        Response<ResultPointOfSaleResponseDto> result =await _pointOfSaleService.TCashierExitReportAsync(userCode, tillId);
         return ActionResultInstance(result);
     }
 }

@@ -1,7 +1,10 @@
 ﻿using DataAccessLayer.Context;
 using DataAccessLayer.Repositories.BasketItemRespositories;
+using DataAccessLayer.Repositories.BasketPaymentRepositories;
 using DataAccessLayer.Repositories.BasketRepositories;
 using DataAccessLayer.Repositories.CategoryRepositories;
+using DataAccessLayer.Repositories.CustomerRepositories;
+using DataAccessLayer.Repositories.GiveBackListRepositories;
 using DataAccessLayer.Repositories.PointOfSaleRepositories;
 using DataAccessLayer.Repositories.ProductRepositories;
 using DataAccessLayer.Repositories.RoleRepositories;
@@ -36,6 +39,9 @@ public static class DataAccessExtensions
         services.AddScoped<IBasketItemRepository, BasketItemRepository>();
         services.AddScoped<ITillRepository, TillRepository>();
         services.AddScoped<IPointOfSaleRepository, PointOfSaleRepository>();
+        services.AddScoped<IBasketPaymentRepository, BasketPaymentRepository>();
+        services.AddScoped<ICustomerRepository, CustomerRepository>();
+        services.AddScoped<IGiveBackListRepository, GiveBackListRepository>();
         return services;
     }
 }

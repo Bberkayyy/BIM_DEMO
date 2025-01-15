@@ -41,6 +41,18 @@ public class BaseDbContext : DbContext
      .WithMany(u => u.PointOfSales)
      .HasForeignKey(p => p.UserCode)
      .HasPrincipalKey(u => u.UserCode);
+
+        modelBuilder.Entity<GiveBackList>()
+            .HasOne(x => x.Product)
+            .WithMany()
+            .HasForeignKey(e => e.ProductBarcodeNo)
+            .HasPrincipalKey(p => p.BarcodeNo);
+
+        modelBuilder.Entity<GiveBackList>()
+            .HasOne(x => x.Customer)
+            .WithMany()
+            .HasForeignKey(e => e.CustomerIdentityNumber)
+            .HasPrincipalKey(c => c.IdentityNumber);
     }
 
     public DbSet<Category>? Categories { get; set; }
@@ -53,4 +65,6 @@ public class BaseDbContext : DbContext
     public DbSet<BasketItem>? BasketItems { get; set; }
     public DbSet<PointOfSale>? PointOfSales { get; set; }
     public DbSet<Till>? Tills { get; set; }
+    public DbSet<Customer>? Customers { get; set; }
+    public DbSet<GiveBackList>? GiveBackLists { get; set; }
 }

@@ -20,4 +20,5 @@ public class Product : EntityBase<int>
     public DateTime? Expiration { get; set; }
     public DateTime? Production { get; set; }
     public ICollection<BasketItem> BasketItems { get; set; } = new List<BasketItem>();
+    public ICollection<GiveBackList> GiveBackLists { get; set; } = new HashSet<GiveBackList>();
 }

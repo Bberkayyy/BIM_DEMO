@@ -1,6 +1,7 @@
 ﻿using BusinessLogicLayer.BusinessRules.Abstract;
 using Core.CrossCuttingConcerns;
 using DataAccessLayer.Repositories.PointOfSaleRepositories;
+using DataAccessLayer.Repositories.ProductRepositories;
 using DataAccessLayer.Repositories.TillRepositories;
 using DataAccessLayer.Repositories.UserRepositories;
 using EntityLayer.Entities;
@@ -17,17 +18,21 @@ public class PointOfSaleRules : IPointOfSaleRules
     private readonly ITillRepository _tillRepository;
     private readonly IUserRepository _userRepository;
 
-
     public PointOfSaleRules(ITillRepository tillRepository, IUserRepository userRepository)
     {
         _tillRepository = tillRepository;
         _userRepository = userRepository;
     }
-
-    public void PointOfSaleExists(PointOfSale pointOfSale)
+    public void PointOfSaleExists(PointOfSale? pointOfSale)
     {
         if (pointOfSale == null)
             throw new BusinessException("Pos not found!");
+    }
+
+    public void ProductExists(Product? product)
+    {
+        if (product == null)
+            throw new BusinessException("Product not found!");
     }
 
     public void TillExists(int tillId)
